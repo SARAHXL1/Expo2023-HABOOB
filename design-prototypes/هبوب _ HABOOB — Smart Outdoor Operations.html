@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هبوب | HABOOB — Smart Outdoor Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F4F2ED; --bg2:#ECE7DD; --surface:#FFFFFF; --surface2:#FAF8F4;
+  --ink:#22201C; --ink2:#5A554C; --ink3:#8F887B; --line:#E3DDD1; --line2:#D6CEBE;
+  --sand:#D9C49F; --sand-deep:#A8834F; --sand-soft:#F1E8D8;
+  --brand:#1F6B4F; --brand-ink:#FFFFFF; --brand-soft:#E3EFE8;
+  --ok:#2E8A5A; --ok-bg:#E4F2EA; --cau:#C9940E; --cau-bg:#FBF1D6; --heat:#D9661F; --heat-bg:#FCE8DA; --crit:#C2362B; --crit-bg:#F9E1DE;
+  --info:#2F6C8F; --info-bg:#E1EDF4;
+  --glass:rgba(255,255,255,.72); --shadow:0 1px 2px rgba(60,45,20,.06),0 8px 24px -12px rgba(60,45,20,.18);
+  --r-lg:18px; --r-md:12px; --r-sm:8px;
+  --side:248px;
+  font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#16150F; --bg2:#1E1C16; --surface:#211F19; --surface2:#1A1914;
+    --ink:#F1ECE2; --ink2:#C2BAAA; --ink3:#8B8475; --line:#34302705; --line:#332F26; --line2:#454033;
+    --sand:#8E7650; --sand-deep:#D3B583; --sand-soft:#2A261D;
+    --brand:#4FB287; --brand-ink:#0E1A14; --brand-soft:#1D3128;
+    --ok:#4FB287; --ok-bg:#1B2E24; --cau:#E5B53A; --cau-bg:#352C14; --heat:#EE8A4A; --heat-bg:#3A2416; --crit:#EE6A5E; --crit-bg:#3B1C19;
+    --info:#6BA9CF; --info-bg:#182A35; --glass:rgba(33,31,25,.78);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16150F; --bg2:#1E1C16; --surface:#211F19; --surface2:#1A1914;
+  --ink:#F1ECE2; --ink2:#C2BAAA; --ink3:#8B8475; --line:#332F26; --line2:#454033;
+  --sand:#8E7650; --sand-deep:#D3B583; --sand-soft:#2A261D;
+  --brand:#4FB287; --brand-ink:#0E1A14; --brand-soft:#1D3128;
+  --ok:#4FB287; --ok-bg:#1B2E24; --cau:#E5B53A; --cau-bg:#352C14; --heat:#EE8A4A; --heat-bg:#3A2416; --crit:#EE6A5E; --crit-bg:#3B1C19;
+  --info:#6BA9CF; --info-bg:#182A35; --glass:rgba(33,31,25,.78);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
+.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;display:inline-block}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.005em}
+h1{font-size:26px;line-height:1.25}
+h2{font-size:18px}
+h3{font-size:15px}
+p{margin:0}
+.muted{color:var(--ink2)} .faint{color:var(--ink3)}
+.sm{font-size:12.5px}
+
+/* ---------- Shell ---------- */
+.shell{display:grid;grid-template-columns:var(--side) 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:var(--surface);border-inline-end:1px solid var(--line);display:flex;flex-direction:column;padding:18px 14px;transition:width .25s ease}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.brand-mark{width:38px;height:38px;flex:none}
+.brand-name{font-weight:700;font-size:19px;line-height:1.1}
+.brand-sub{font-size:11.5px;color:var(--ink3)}
+.nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--ink2);text-decoration:none;font-weight:500;position:relative;transition:background .15s,color .15s}
+.nav a svg{width:19px;height:19px;flex:none}
+.nav a:hover{background:var(--surface2);color:var(--ink)}
+.nav a.on{background:var(--brand-soft);color:var(--brand)}
+.nav a.on::before{content:"";position:absolute;inset-inline-start:-14px;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--brand)}
+.nav .count{margin-inline-start:auto;background:var(--crit);color:#fff;font-size:11px;font-weight:600;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 6px}
+.nav-sep{height:1px;background:var(--line);margin:12px 8px}
+.side-foot{margin-top:auto;padding:12px;border-radius:var(--r-md);background:var(--sand-soft);font-size:12.5px;color:var(--ink2)}
+.side-foot b{color:var(--ink);display:block;margin-bottom:2px}
+.loop{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.loop span{font-size:11px;padding:2px 7px;border-radius:20px;background:var(--surface);border:1px solid var(--line)}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:12px 28px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .crumb{font-weight:600;font-size:15px}
+.top .spacer{flex:1}
+.clock{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
+[dir=rtl] .clock{align-items:flex-start}
+.clock .t{font-weight:600;font-size:15px}
+.clock .d{font-size:11.5px;color:var(--ink3)}
+.sys{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:20px;background:var(--surface);border:1px solid var(--line);font-size:12.5px;font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.dot.live{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,currentColor 45%,transparent)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;position:relative}
+.icon-btn:hover{border-color:var(--line2)}
+.icon-btn svg{width:18px;height:18px}
+.icon-btn .badge-dot{position:absolute;top:7px;inset-inline-end:8px;width:8px;height:8px;border-radius:50%;background:var(--crit);border:2px solid var(--surface)}
+.lang{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.lang button{border:0;background:none;padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink3)}
+.lang button.on{background:var(--ink);color:var(--bg)}
+.user{display:flex;align-items:center;gap:10px;padding:4px 4px 4px 12px;border-radius:12px}
+[dir=rtl] .user{padding:4px 12px 4px 4px}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--sand),var(--sand-deep));color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+.user .n{font-weight:600;font-size:13px;line-height:1.2}
+.user .r{font-size:11.5px;color:var(--ink3)}
+.page{padding:24px 28px 80px;max-width:1600px;width:100%}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.page-head p{margin-top:4px}
+.demo-tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:3px 10px;border-radius:20px;background:var(--sand-soft);color:var(--sand-deep);font-weight:600;border:1px dashed var(--sand)}
+
+/* ---------- Building blocks ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.card-pad{padding:20px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.card-head p{font-size:12.5px;color:var(--ink3)}
+.grid{display:grid;gap:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:9px 16px;font-weight:600;font-size:13.5px;border:1px solid transparent;transition:transform .12s,background .15s,border-color .15s;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--brand);color:var(--brand-ink)}
+.btn-primary:hover{background:color-mix(in srgb,var(--brand) 88%,#000)}
+.btn-dark{background:var(--ink);color:var(--bg)}
+.btn-ghost{background:var(--surface);border-color:var(--line2);color:var(--ink)}
+.btn-ghost:hover{background:var(--surface2)}
+.btn-text{background:none;color:var(--ink2);padding:9px 10px}
+.btn-text:hover{color:var(--ink)}
+.btn-danger{background:var(--crit);color:#fff}
+.btn-sm{padding:6px 11px;font-size:12.5px;border-radius:8px}
+.btn-lg{padding:13px 22px;font-size:15px;border-radius:12px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge .dot{width:7px;height:7px}
+.b-ok{background:var(--ok-bg);color:var(--ok)} .b-ok .dot{background:var(--ok)}
+.b-cau{background:var(--cau-bg);color:var(--cau)} .b-cau .dot{background:var(--cau)}
+.b-heat{background:var(--heat-bg);color:var(--heat)} .b-heat .dot{background:var(--heat)}
+.b-crit{background:var(--crit-bg);color:var(--crit)} .b-crit .dot{background:var(--crit)}
+.b-info{background:var(--info-bg);color:var(--info)} .b-info .dot{background:var(--info)}
+.b-neutral{background:var(--bg2);color:var(--ink2)} .b-neutral .dot{background:var(--ink3)}
+.b-ai{background:linear-gradient(90deg,var(--brand-soft),var(--sand-soft));color:var(--brand)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line2);background:var(--surface);padding:6px 12px;border-radius:20px;font-size:12.5px;font-weight:500;color:var(--ink2)}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.input{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--line2);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s}
+.input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+label.f{display:block;font-size:12.5px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+select.input{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink3) 50%),linear-gradient(135deg,var(--ink3) 50%,transparent 50%);background-size:5px 5px;background-repeat:no-repeat;background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%}
+[dir=rtl] select.input{background-position:18px 50%,13px 50%}
+.switch{width:40px;height:23px;border-radius:12px;background:var(--line2);border:0;position:relative;transition:background .2s;flex:none;padding:0}
+.switch::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:inset-inline-start .2s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.switch.on{background:var(--brand)}
+.switch.on::after{inset-inline-start:20px}
+.seg{display:inline-flex;background:var(--bg2);border-radius:9px;padding:3px}
+.seg button{border:0;background:none;padding:5px 11px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink3)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+table.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:12px;font-weight:600;color:var(--ink3);text-align:start;padding:11px 16px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface2)}
+.tbl td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{transition:background .12s}
+.tbl tbody tr.click:hover{background:var(--surface2);cursor:pointer}
+.scroll-x{overflow-x:auto}
+.empty{padding:40px;text-align:center;color:var(--ink3)}
+
+/* ---------- KPIs ---------- */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.kpi{padding:16px 18px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;cursor:default}
+.kpi .k-label{font-size:12.5px;color:var(--ink2);font-weight:500;display:flex;align-items:center;gap:8px}
+.kpi .k-val{font-size:32px;font-weight:600;line-height:1;transition:color .3s}
+.kpi .k-foot{font-size:11.5px;color:var(--ink3)}
+.kpi .bar{position:absolute;inset-inline-start:0;top:16px;bottom:16px;width:3px;border-radius:3px}
+.kpi.flash .k-val{animation:flash 1.2s ease}
+@keyframes flash{0%{transform:scale(1)}30%{transform:scale(1.18)}100%{transform:scale(1)}}
+
+/* ---------- Map ---------- */
+.map-wrap{position:relative;width:100%;aspect-ratio:1/1;max-height:720px;margin-inline:auto}
+.map-wrap svg{width:100%;height:100%;display:block;direction:ltr}
+.zone-shape{cursor:pointer;transition:filter .15s,stroke-width .15s}
+.zone-shape:hover{filter:brightness(1.05) saturate(1.2);stroke-width:2.6}
+.zone-shape.sel{stroke-width:3.2}
+.zone-label{pointer-events:none;font-weight:600;font-family:inherit}
+.crit-pulse{animation:cpulse 1.8s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes cpulse{0%,100%{opacity:.25}50%{opacity:.75}}
+.pole{cursor:pointer}
+.pole .ring{animation:pring 2.4s ease-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes pring{0%{transform:scale(.6);opacity:.8}100%{transform:scale(2.4);opacity:0}}
+.flash-ring{animation:fring 1.6s ease-out 3;transform-origin:center;transform-box:fill-box}
+@keyframes fring{0%{opacity:1;stroke-width:6}100%{opacity:0;stroke-width:22}}
+.map-pop{position:absolute;z-index:5;min-width:220px;background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px;transform:translate(-50%,calc(-100% - 14px));font-size:12.5px;animation:popin .18s ease}
+@keyframes popin{from{opacity:0;transform:translate(-50%,calc(-100% - 6px))}}
+.map-pop .rows{display:grid;grid-template-columns:auto auto;gap:4px 18px;margin-top:8px}
+.map-pop .rows span:nth-child(odd){color:var(--ink3)}
+.map-pop .rows span:nth-child(even){font-weight:600;text-align:end}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:6px;vertical-align:-1px}
+.layer-list{display:flex;flex-direction:column;gap:2px}
+.layer{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid var(--line)}
+.layer:last-child{border-bottom:0}
+.layer .sw{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none}
+.layer .sw svg{width:15px;height:15px}
+.layer .txt{flex:1;line-height:1.3}
+.layer .txt small{display:block;color:var(--ink3);font-size:11.5px}
+
+/* ---------- Overview ---------- */
+.ov-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);gap:18px;align-items:start}
+.quick{padding:18px 20px}
+.quick-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.metric{padding:11px 13px;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.metric .ml{font-size:11.5px;color:var(--ink3);display:flex;align-items:center;gap:6px}
+.metric .ml svg{width:14px;height:14px}
+.metric .mv{font-size:19px;font-weight:600;margin-top:2px}
+.metric .mv small{font-size:12px;color:var(--ink3);font-weight:500;margin-inline-start:2px}
+.utci-hero{display:flex;align-items:baseline;gap:6px}
+.utci-hero .v{font-size:44px;font-weight:600;line-height:1}
+.alert-row{display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);align-items:flex-start;transition:background .12s}
+.alert-row:last-child{border-bottom:0}
+.alert-row:hover{background:var(--surface2)}
+.sev{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+.sev svg{width:17px;height:17px}
+.sev.crit{background:var(--crit-bg);color:var(--crit)}
+.sev.heat{background:var(--heat-bg);color:var(--heat)}
+.sev.cau{background:var(--cau-bg);color:var(--cau)}
+.sev.info{background:var(--info-bg);color:var(--info)}
+.sev.ok{background:var(--ok-bg);color:var(--ok)}
+.log{list-style:none;margin:0;padding:6px 20px 14px}
+.log li{display:grid;grid-template-columns:52px 14px 1fr;gap:10px;padding:9px 0;align-items:start;position:relative}
+.log li .lt{font-size:12px;color:var(--ink3);padding-top:1px}
+.log li .ld{width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--line2);position:relative}
+.log li:not(:last-child) .ld::after{content:"";position:absolute;top:12px;left:4px;width:1px;height:34px;background:var(--line)}
+.log li .lx{font-size:13px}
+.log li .lx small{display:block;color:var(--ink3);font-size:11.5px}
+.log li.new{animation:newrow 2.4s ease}
+@keyframes newrow{0%{background:var(--brand-soft)}100%{background:transparent}}
+
+/* ---------- Zone details ---------- */
+.zd-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;margin-bottom:18px}
+.zd-status{padding:22px 24px;position:relative;overflow:hidden}
+.zd-status .big{font-size:64px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.zd-status .big small{font-size:22px;color:var(--ink3);font-weight:500}
+.scale{margin-top:20px}
+.scale-bar{display:grid;grid-template-columns:repeat(5,1fr);height:12px;border-radius:6px;overflow:hidden;gap:2px;direction:ltr}
+.scale-bar div:nth-child(1){background:#7DBF9A}.scale-bar div:nth-child(2){background:#E2C25B}.scale-bar div:nth-child(3){background:#E79A4F}.scale-bar div:nth-child(4){background:#D9563A}.scale-bar div:nth-child(5){background:#8E1F1A}
+.scale-track{position:relative;height:22px;direction:ltr}
+.scale-pin{position:absolute;top:0;transform:translateX(-50%);transition:left 1.2s cubic-bezier(.3,.8,.2,1);display:flex;flex-direction:column;align-items:center}
+.scale-pin::before{content:"";width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:9px solid var(--ink)}
+.scale-labels{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;font-size:11px;color:var(--ink3);margin-top:6px;direction:ltr;text-align:center}
+[dir=rtl] .scale-labels span{direction:rtl}
+.scale-labels span.on{color:var(--ink);font-weight:600}
+.env-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.env{padding:16px 18px}
+.env .el{display:flex;align-items:center;justify-content:space-between;color:var(--ink2);font-size:12.5px}
+.env .el svg{width:18px;height:18px;color:var(--ink3)}
+.env .ev{font-size:28px;font-weight:600;margin-top:6px;line-height:1.1}
+.env .ev small{font-size:13px;color:var(--ink3);font-weight:500}
+.env .eh{font-size:11.5px;margin-top:6px}
+.env.flagged{border-color:color-mix(in srgb,var(--heat) 45%,var(--line))}
+.env.flagged .eh{color:var(--heat);font-weight:600}
+.rec{position:relative;overflow:hidden;border:1px solid color-mix(in srgb,var(--brand) 30%,var(--line));background:linear-gradient(160deg,color-mix(in srgb,var(--brand-soft) 70%,var(--surface)) 0%,var(--surface) 60%)}
+.rec-in{padding:22px 24px}
+.rec .ttl{font-size:22px;font-weight:600;margin:10px 0 8px}
+.rec .why{color:var(--ink2);max-width:62ch}
+.rec .impact{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.rec .impact div{padding:10px 12px;border-radius:10px;background:var(--glass);border:1px solid var(--line)}
+.rec .impact b{display:block;font-size:17px}
+.rec .impact span{font-size:11.5px;color:var(--ink3)}
+.rec .acts{display:flex;gap:8px;flex-wrap:wrap}
+.rec.done{border-color:color-mix(in srgb,var(--ok) 35%,var(--line));background:linear-gradient(160deg,var(--ok-bg),var(--surface) 65%)}
+.factor{display:grid;grid-template-columns:130px 1fr 52px;gap:12px;align-items:center;padding:8px 0}
+.factor .fb{height:8px;border-radius:4px;background:var(--bg2);overflow:hidden;direction:ltr}
+.factor .fb div{height:100%;border-radius:4px}
+.factor .fv{font-size:12.5px;font-weight:600;text-align:end}
+.dev-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.dev-row:last-child{border-bottom:0}
+.dev-ic{width:36px;height:36px;border-radius:10px;background:var(--bg2);display:grid;place-items:center;flex:none;color:var(--ink2)}
+.dev-ic svg{width:18px;height:18px}
+.dev-ic.on{background:var(--brand-soft);color:var(--brand)}
+
+/* ---------- Alerts ---------- */
+.alert-card{display:grid;grid-template-columns:auto 1fr auto;gap:16px;padding:18px 20px;align-items:start;border-inline-start:4px solid transparent}
+.alert-card.crit{border-inline-start-color:var(--crit)}
+.alert-card.heat{border-inline-start-color:var(--heat)}
+.alert-card.cau{border-inline-start-color:var(--cau)}
+.alert-card.info{border-inline-start-color:var(--info)}
+.alert-card.resolved{opacity:.72;border-inline-start-color:var(--ok)}
+.alert-card .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--ink3);margin-top:2px}
+.alert-card .rec-line{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:13px;display:flex;gap:8px;align-items:flex-start}
+.alert-card .rec-line svg{width:16px;height:16px;color:var(--brand);flex:none;margin-top:2px}
+.alert-card .acts{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:130px}
+.alert-card.new{animation:alertIn .6s ease}
+@keyframes alertIn{from{transform:translateY(-6px);opacity:0}}
+
+/* ---------- Modal / toast ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(25,20,12,.42);backdrop-filter:blur(3px);z-index:60;display:grid;place-items:center;padding:20px;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}}
+.modal{width:min(560px,100%);max-height:calc(100% - 40px);overflow:auto;background:var(--surface);border-radius:20px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45);animation:rise .25s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{transform:translateY(14px) scale(.98);opacity:0}}
+.modal-h{padding:22px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.modal-b{padding:16px 24px}
+.modal-f{padding:16px 24px 22px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--line)}
+.steps-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.steps-list li{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);font-size:13.5px}
+.steps-list li .st{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex:none;border:2px solid var(--line2)}
+.steps-list li.doing .st{border-color:var(--brand);border-top-color:transparent;animation:spin .8s linear infinite}
+.steps-list li.done .st{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.steps-list li.done .st svg{width:13px;height:13px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-mark{width:64px;height:64px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;margin:4px auto 14px}
+.success-mark svg{width:32px;height:32px;stroke-dasharray:30;stroke-dashoffset:30;animation:draw .6s .1s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.compare > div{padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--surface2)}
+.compare > div.best{border-color:color-mix(in srgb,var(--brand) 40%,var(--line));background:var(--brand-soft)}
+.compare dl{display:grid;grid-template-columns:auto auto;gap:6px 12px;margin:10px 0 0;font-size:13px}
+.compare dt{color:var(--ink3)} .compare dd{margin:0;font-weight:600;text-align:end}
+.toasts{position:fixed;bottom:22px;inset-inline-start:22px;z-index:70;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;gap:10px;align-items:center;padding:12px 16px;border-radius:12px;background:var(--ink);color:var(--bg);box-shadow:var(--shadow);font-size:13.5px;animation:rise .25s ease;max-width:380px}
+.toast svg{width:18px;height:18px;flex:none;color:var(--brand)}
+
+/* ---------- Demo guide ---------- */
+.guide{position:fixed;bottom:22px;inset-inline-end:22px;z-index:50;background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px 14px;width:280px;font-size:12.5px}
+.guide-h{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:8px}
+.guide ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.guide li{display:flex;gap:8px;align-items:center;color:var(--ink3)}
+.guide li i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-style:normal;font-size:10px;flex:none}
+.guide li.done{color:var(--ink2)} .guide li.done i{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.guide li.cur{color:var(--ink);font-weight:600} .guide li.cur i{border-color:var(--brand);color:var(--brand)}
+.guide.min ol{display:none}
+.guide.min{width:auto}
+
+/* ---------- Login ---------- */
+.login{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(380px,520px);background:var(--bg)}
+.login-art{position:relative;overflow:hidden;background:linear-gradient(170deg,#EFE3CC 0%,#E2CDA6 55%,#C9A673 100%);display:flex;flex-direction:column;justify-content:space-between;padding:44px 48px;color:#2A2216}
+:root[data-theme="dark"] .login-art{background:linear-gradient(170deg,#2B2519 0%,#3A2F1E 55%,#5A4527 100%);color:#F1E6D2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .login-art{background:linear-gradient(170deg,#2B2519 0%,#3A2F1E 55%,#5A4527 100%);color:#F1E6D2}}
+.login-art svg.wind{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
+.wind path{fill:none;stroke-linecap:round}
+.wind .w{stroke-dasharray:180 900;animation:wind 9s linear infinite}
+@keyframes wind{from{stroke-dashoffset:1080}to{stroke-dashoffset:0}}
+.login-art .lt{position:relative;max-width:30ch}
+.login-art .lt h1{font-size:46px;line-height:1.1;font-weight:700}
+.login-art .lt p{font-size:16px;margin-top:14px;opacity:.85}
+.login-art .lb{position:relative;display:flex;gap:28px;font-size:13px}
+.login-art .lb b{display:block;font-size:22px}
+.login-form{display:flex;flex-direction:column;justify-content:center;padding:48px 56px;background:var(--surface)}
+.login-form form{display:flex;flex-direction:column;gap:16px;max-width:380px;width:100%;margin-inline:auto}
+.login-form .row{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.check{display:flex;align-items:center;gap:8px;cursor:pointer}
+.check input{width:16px;height:16px;accent-color:var(--brand)}
+
+/* ---------- Charts ---------- */
+.chart svg{width:100%;height:auto;display:block;direction:ltr;overflow:visible}
+.chart text{font-family:inherit;fill:var(--ink3);font-size:11px}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.heat-grid{display:grid;gap:3px;direction:ltr}
+.heat-grid div{aspect-ratio:1.4/1;border-radius:4px}
+.insight{display:flex;gap:12px;padding:14px 16px;border-radius:14px;background:var(--surface2);border:1px solid var(--line)}
+.insight .ii{width:32px;height:32px;border-radius:9px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;flex:none}
+.insight .ii svg{width:16px;height:16px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{padding:14px 16px;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.stat b{display:block;font-size:24px;font-weight:600}
+.stat span{font-size:12px;color:var(--ink3)}
+
+/* ---------- Automation ---------- */
+.sys-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.sys-card{padding:18px;cursor:pointer;transition:border-color .15s}
+.sys-card.on{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.sys-card .si{width:40px;height:40px;border-radius:12px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
+.sys-card .si svg{width:20px;height:20px}
+.flow-strip{display:flex;align-items:center;gap:10px;padding:14px 18px;flex-wrap:wrap}
+.flow-strip .fs{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
+.flow-strip .fs span{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--bg2);font-size:12px}
+.flow-strip .arr{color:var(--ink3)}
+[dir=rtl] .flow-strip .arr{transform:scaleX(-1)}
+.pending{display:flex;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.pending:last-child{border-bottom:0}
+
+/* ---------- Pole ---------- */
+.pole-art{display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:center}
+.pole-art svg{width:100%;height:auto;max-height:420px}
+.pole-spec{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.pole-spec div{padding:12px 14px;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.pole-spec b{display:block;font-size:13.5px}
+.pole-spec span{font-size:12px;color:var(--ink3)}
+.batt{display:inline-flex;align-items:center;gap:6px}
+.batt i{width:26px;height:11px;border:1.5px solid var(--ink3);border-radius:3px;position:relative;display:inline-block}
+.batt i::after{content:"";position:absolute;top:1px;bottom:1px;left:1px;width:var(--w);border-radius:1px;background:var(--c)}
+
+/* ---------- DS ---------- */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.swatch{border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.swatch div{height:58px}
+.swatch p{padding:8px 10px;font-size:12px}
+.swatch p b{display:block;font-size:12.5px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tabs button{border:0;background:none;padding:10px 14px;font-weight:600;color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--brand)}
+.ia{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.ia div{padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface2)}
+.ia b{display:block;font-size:13.5px;margin-bottom:4px}
+.ia span{font-size:12px;color:var(--ink3)}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.flow span{padding:8px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:13px;font-weight:500}
+.flow em{font-style:normal;color:var(--ink3)}
+[dir=rtl] .flow em{transform:scaleX(-1);display:inline-block}
+
+.fade-in{animation:fade .3s ease}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+@media (max-width:1280px){.kpis{grid-template-columns:repeat(3,1fr)}.env-grid{grid-template-columns:repeat(2,1fr)}.sys-cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:1080px){.ov-grid,.zd-hero{grid-template-columns:1fr}.shell{--side:76px}.brand-txt,.nav a span.lbl,.nav .count,.side-foot,.nav-sep{display:none}.nav a{justify-content:center}.login{grid-template-columns:1fr}.login-art{min-height:320px}}
+@media (max-width:720px){.shell{grid-template-columns:1fr}.side{position:fixed;bottom:0;top:auto;height:auto;width:100%;flex-direction:row;padding:6px;z-index:40;border-inline-end:0;border-top:1px solid var(--line);padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}.brand{display:none}.nav{flex-direction:row;overflow-x:auto;margin:0;width:100%}.nav a.on::before{display:none}.top{padding:10px 14px;flex-wrap:wrap}.user .n,.user .r,.clock .d{display:none}.page{padding:16px 14px 120px}.kpis{grid-template-columns:repeat(2,1fr)}.stat-row{grid-template-columns:repeat(2,1fr)}.pole-art{grid-template-columns:1fr}.guide{display:none}.alert-card{grid-template-columns:auto 1fr}.alert-card .acts{grid-column:1/-1;flex-direction:row}.rec .impact{grid-template-columns:1fr}.login-form{padding:32px 22px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* =========================================================
+   HABOOB — Smart Outdoor Operations (demo prototype)
+   Data layer is mock and shaped to be replaced by a sensors API:
+   getZones(), getSensors(), getAlerts(), getEvents(), getDevices()
+   ========================================================= */
+
+/* ---------------- i18n ---------------- */
+const T = {
+  appName:['هبوب','HABOOB'], appSub:['تشغيل المساحات الخارجية الذكي','Smart Outdoor Operations'],
+  overview:['نظرة عامة','Overview'], liveMap:['الخريطة الحية','Live Map'], zones:['المناطق','Zones'], alerts:['التنبيهات','Alerts'],
+  events:['الفعاليات','Events'], automation:['الأتمتة','Automation'], analytics:['التحليلات','Analytics'], sensors:['شبكة المستشعرات','Sensor Network'], settings:['الإعدادات','Settings'],
+  sysOk:['جميع الأنظمة تعمل','All systems operational'], sysWarn:['مستشعر واحد غير متصل','1 sensor offline'],
+  demo:['بيانات عرض تجريبية','Demo data'], demoDate:['الخميس 14 نوفمبر 2030','Thu, 14 Nov 2030'],
+  userName:['نورة القحطاني','Noura Al-Qahtani'], userRole:['قائدة فريق التشغيل الخارجي','Outdoor Ops Lead'],
+  loopTitle:['دورة هبوب','The Haboob loop'], sense:['استشعار','Sense'], analyze:['تحليل','Analyze'], decide:['قرار','Decide'], act:['تنفيذ','Act'], learn:['تعلّم','Learn'],
+  // login
+  loginH:['الراحة الحرارية لكل زائر، في كل ساحة.','Thermal comfort for every visitor, in every plaza.'],
+  loginP:['منصة تشغيل لحظية تراقب ظروف المساحات الخارجية في إكسبو 2030 الرياض وتقترح الإجراء المناسب قبل أن يشعر الزائر بالحر.','A real-time operations platform that watches Expo 2030 Riyadh’s outdoor spaces and recommends the right action before visitors feel the heat.'],
+  loginStat1:['منطقة خارجية','outdoor zones'], loginStat2:['عمود استشعار','sensor poles'], loginStat3:['تحديث كل','updates every'],
+  welcome:['تسجيل الدخول','Sign in'], welcomeP:['مركز عمليات المساحات الخارجية — إكسبو 2030 الرياض','Outdoor Operations Center — Expo 2030 Riyadh'],
+  email:['البريد الإلكتروني','Email'], password:['كلمة المرور','Password'], remember:['تذكرني','Remember me'], forgot:['نسيت كلمة المرور؟','Forgot password?'], login:['دخول','Sign in'], signingIn:['جارٍ التحقق…','Verifying…'],
+  ssoNote:['الدخول مخصص لفرق التشغيل المعتمدة في إكسبو 2030.','Access is limited to authorized Expo 2030 operations teams.'],
+  // statuses
+  st_ok:['مريحة','Comfortable'], st_cau:['تنبيه','Caution'], st_heat:['إجهاد حراري','Heat stress'], st_crit:['حرجة','Critical'],
+  cat0:['مريح','Comfortable'], cat1:['معتدل','Moderate'], cat2:['إجهاد حراري قوي','Strong heat stress'], cat3:['إجهاد حراري قوي جدًا','Very strong heat stress'], cat4:['إجهاد حراري شديد','Extreme heat stress'],
+  // KPIs
+  kTotal:['إجمالي المناطق الخارجية','Total outdoor zones'], kOk:['مريحة','Comfortable'], kAttn:['تحتاج متابعة','Needs attention'], kCrit:['حرجة','Critical'], kAlerts:['تنبيهات نشطة','Active alerts'],
+  kTotalF:['36 عمود استشعار متصل','36 sensor poles linked'], kOkF:['UTCI أقل من 32°','UTCI below 32°'], kAttnF:['UTCI بين 32° و42°','UTCI 32°–42°'], kCritF:['UTCI أعلى من 42°','UTCI above 42°'], kAlertsF:['تتطلب قرارًا من المشغل','Awaiting an operator decision'],
+  // overview
+  ovTitle:['ماذا يحدث الآن','What’s happening now'], ovSub:['حالة المساحات الخارجية لحظيًا، مرتبة حسب الأولوية.','Live status of outdoor spaces, sorted by priority.'],
+  mapTitle:['خريطة إكسبو الحية','Live Expo map'], mapSub:['اضغط على أي منطقة لعرض حالتها','Select any zone to see its conditions'],
+  quickTitle:['المنطقة المحددة','Selected zone'], openZone:['فتح تفاصيل المنطقة','Open zone details'],
+  actNow:['تتطلب قرارك الآن','Needs your decision'], viewAll:['عرض الكل','View all'],
+  activity:['سجل العمليات','Activity log'], activitySub:['كل إجراء موثّق مع المسؤول عنه','Every action logged with who approved it'],
+  forecast:['توقع هبوب للساعات القادمة','Haboob forecast, next hours'], forecastSub:['متوسط UTCI لجميع المناطق','Average UTCI across all zones'],
+  peakAt:['الذروة المتوقعة','Expected peak'], cooling:['انخفاض متوقع بعد','Expected relief after'],
+  // metrics
+  temp:['درجة الحرارة','Temperature'], hum:['الرطوبة','Humidity'], wind:['سرعة الرياح','Wind speed'], solar:['الإشعاع الشمسي','Solar radiation'], utci:['مؤشر UTCI','UTCI'], status:['الحالة','Status'],
+  feelsLike:['الإحساس الحراري الفعلي للزائر','What visitors actually feel'],
+  // zone
+  zoneDetails:['تفاصيل المنطقة','Zone details'], back:['رجوع','Back'], thermalComfort:['مؤشر الراحة الحرارية','Thermal comfort indicator'],
+  envCond:['الظروف البيئية','Environmental conditions'], whyTitle:['لماذا ارتفع الإجهاد الحراري؟','Why is heat stress high?'], whySub:['مساهمة كل عامل في UTCI مقارنة بظروف مرجعية مريحة','Each factor’s contribution to UTCI vs. a comfortable baseline'],
+  fSolar:['إشعاع شمسي مرتفع','High solar radiation'], fWind:['رياح ضعيفة','Low wind'], fTemp:['حرارة الهواء','Air temperature'], fHum:['رطوبة','Humidity'], fShade:['لا يوجد تظليل نشط','No active shading'],
+  aboveNormal:['أعلى من المعتاد','Above normal'], belowNormal:['أقل من المعتاد','Below normal'], normal:['ضمن المعتاد','Within normal'],
+  recTitle:['توصية هبوب','Haboob recommendation'], recAction:['الإجراء المقترح','Recommended action'], confidence:['ثقة التوصية','Confidence'],
+  activateNow:['تفعيل الآن','Activate now'], schedule:['جدولة','Schedule'], dismiss:['تجاهل','Dismiss'],
+  impUtci:['انخفاض متوقع في UTCI','Expected UTCI drop'], impTime:['زمن التأثير','Time to effect'], impWater:['استهلاك المياه','Water use'],
+  recDone:['تم تنفيذ الإجراء','Action applied'], recDoneP:['هبوب يراقب المنطقة وسيعيد التقييم كل 5 دقائق.','Haboob is monitoring the zone and will re-evaluate every 5 minutes.'],
+  noRec:['لا يتطلب إجراء','No action needed'], noRecP:['المنطقة ضمن نطاق الراحة. سيواصل هبوب المراقبة.','The zone is within comfort range. Haboob keeps monitoring.'],
+  trend12:['UTCI خلال اليوم مع توقع هبوب','UTCI today with Haboob forecast'], actual:['فعلي','Actual'], predicted:['متوقع','Forecast'], threshold:['حد الإجهاد 38°','Stress threshold 38°'],
+  linked:['الأنظمة المرتبطة بالمنطقة','Systems in this zone'], poles:['أعمدة الاستشعار','Sensor poles'], visitorsNow:['الزوار الآن','Visitors now'],
+  // actions
+  approveTitle:['اعتماد الإجراء','Approve action'], approveP:['هبوب يقترح، وأنت تعتمد. سيتم إرسال الأوامر التالية:','Haboob recommends, you approve. These commands will be sent:'],
+  approve:['اعتماد وتفعيل','Approve & activate'], cancel:['إلغاء','Cancel'], close:['إغلاق','Close'],
+  sending:['جارٍ إرسال الأوامر…','Sending commands…'], cmdShade:['نشر مظلات المنطقة إلى 80%','Deploy zone shades to 80%'], cmdMist:['تشغيل الرذاذ — المستوى 2','Start misting — level 2'], cmdFans:['تشغيل المراوح الذكية','Start smart fans'], cmdVerify:['التحقق من قراءات المستشعرات','Verify sensor readings'],
+  doneTitle:['تم التفعيل بنجاح','Activated successfully'], doneP:['انخفض UTCI في المنطقة وتم تحديث حالتها.','UTCI in the zone dropped and its status was updated.'],
+  backOverview:['العودة إلى النظرة العامة','Back to overview'], stayHere:['البقاء في المنطقة','Stay on zone'],
+  scheduled:['تمت جدولة الإجراء الساعة 14:45','Action scheduled for 14:45'], dismissed:['تم تجاهل التوصية وتسجيل السبب','Recommendation dismissed and logged'],
+  // alerts page
+  alertsSub:['كل تنبيه يأتي مع سبب وإجراء مقترح.','Every alert comes with a cause and a recommended action.'],
+  all:['الكل','All'], active:['نشطة','Active'], inProgress:['قيد التنفيذ','In progress'], resolved:['تم الحل','Resolved'],
+  viewZone:['عرض المنطقة','View zone'], activate:['تفعيل','Activate'], optimize:['تحسين الفعالية','Optimize event'], dispatch:['إرسال فريق الصيانة','Dispatch maintenance'],
+  recommended:['التوصية','Recommended'], sev_crit:['حرج','Critical'], sev_heat:['مرتفع','High'], sev_cau:['متوسط','Medium'], sev_info:['معلومة','Info'],
+  // events
+  eventsSub:['خطط الفعاليات حسب الراحة الحرارية المتوقعة، لا حسب الجدول فقط.','Plan events around expected thermal comfort, not just the calendar.'],
+  ev_event:['الفعالية','Event'], ev_zone:['المنطقة','Zone'], ev_date:['التاريخ','Date'], ev_time:['الوقت','Time'], ev_vis:['الزوار المتوقعون','Expected visitors'], ev_comfort:['الراحة الحرارية','Thermal comfort'], ev_rec:['التوصية','Recommendation'],
+  risk_low:['منخفض','Low risk'], risk_mod:['متوسط','Moderate'], risk_high:['مرتفع','High risk'], risk_crit:['حرج','Critical'],
+  keep:['مناسبة كما هي','Good as planned'], optTitle:['تحسين الفعالية بالذكاء الاصطناعي','AI event optimization'],
+  current:['الخطة الحالية','Current plan'], suggested:['اقتراح هبوب','Haboob suggestion'], bestZone:['أفضل منطقة','Best zone'], bestTime:['أفضل وقت','Best time'], expUtci:['UTCI المتوقع','Expected UTCI'], reason:['السبب','Reason'],
+  apply:['تطبيق الاقتراح','Apply suggestion'], applied:['تم تحديث الفعالية','Event updated'], visitors:['زائر','visitors'], optimized:['محسّنة','Optimized'],
+  // automation
+  autoSub:['هبوب يقترح، والمشغل يعتمد. القواعد المتكررة فقط تعمل تلقائيًا.','Haboob recommends, the operator approves. Only repeat rules run on their own.'],
+  flow1:['توصية الذكاء الاصطناعي','AI recommendation'], flow2:['اعتماد المشغل','Operator approval'], flow3:['تنفيذ','Action'], flow4:['مراقبة','Monitoring'],
+  misting:['الرذاذ','Misting'], shading:['التظليل','Shading'], coolingSys:['التبريد','Cooling'], fans:['المراوح الذكية','Smart fans'],
+  activeUnits:['وحدات نشطة','units active'], pendingTitle:['بانتظار اعتمادك','Awaiting your approval'], pendingSub:['توصيات وقواعد تم تفعيلها وتحتاج موافقة','Recommendations and triggered rules that need sign-off'],
+  approveBtn:['اعتماد','Approve'], reject:['رفض','Reject'], devices:['الأجهزة','Devices'],
+  d_system:['النظام','System'], d_zone:['المنطقة','Zone'], d_status:['الحالة الحالية','Current status'], d_mode:['الوضع','Mode'], d_trigger:['قاعدة التشغيل','Trigger'], d_last:['آخر إجراء','Last action'],
+  on:['يعمل','ON'], off:['متوقف','OFF'], pending:['بانتظار الاعتماد','Pending approval'], auto:['تلقائي','Automatic'], manual:['يدوي','Manual'],
+  turnOn:['تشغيل','Turn ON'], turnOff:['إيقاف','Turn OFF'], configure:['ضبط','Configure'], configTitle:['ضبط قاعدة التشغيل','Configure trigger rule'],
+  ruleWhen:['التفعيل عندما يتجاوز UTCI','Activate when UTCI exceeds'], requireApproval:['يتطلب اعتماد المشغل','Require operator approval'], save:['حفظ','Save'], saved:['تم حفظ القاعدة','Rule saved'],
+  confirmOn:['تأكيد تشغيل الجهاز','Confirm turning on'], confirmOnP:['سيتم تشغيل الجهاز يدويًا وتسجيل الإجراء باسمك.','The device will be turned on manually and logged under your name.'],
+  // analytics
+  anSub:['ما الذي تعلّمه هبوب من الأيام السبعة الماضية.','What Haboob learned from the past 7 days.'],
+  trendsT:['اتجاهات الراحة الحرارية','Thermal comfort trends'], trendsS:['UTCI خلال اليوم — أمس','UTCI through the day — yesterday'],
+  zonePerfT:['أداء المناطق','Zone performance'], zonePerfS:['ساعات تجاوز UTCI لـ 38° خلال 7 أيام','Hours with UTCI above 38° over 7 days'],
+  peakT:['ساعات ذروة الحرارة','Peak heat hours'], peakS:['متوسط UTCI لكل ساعة ويوم','Average UTCI by hour and day'],
+  resT:['استهلاك الموارد','Resource consumption'], resS:['تشغيل هبوب الموجّه مقابل الجدول الثابت','Haboob-guided operation vs. fixed schedule'],
+  water:['المياه','Water'], energy:['الطاقة','Energy'], baseline:['جدول ثابت','Fixed schedule'], haboobOps:['تشغيل هبوب','Haboob ops'],
+  effT:['الكفاءة التشغيلية','Operational efficiency'], interventions:['تدخل تشغيلي','interventions'], approvedRate:['نسبة اعتماد التوصيات','Recommendation approval rate'], respTime:['متوسط زمن الاستجابة','Avg. response time'], autoRuns:['تشغيل تلقائي بالقواعد','Rule-based auto runs'],
+  insights:['رؤى هبوب','Haboob insights'],
+  days:[['سبت','أحد','إثنين','ثلاثاء','أربعاء','خميس','جمعة'],['Sat','Sun','Mon','Tue','Wed','Thu','Fri']],
+  // sensors
+  sensSub:['أعمدة هبوب الذكية المنتشرة في المساحات الخارجية.','Haboob smart poles deployed across the outdoor spaces.'],
+  s_id:['رقم المستشعر','Sensor ID'], s_batt:['البطارية','Battery'], s_conn:['الاتصال','Connection'], s_last:['آخر تحديث','Last update'],
+  online:['متصل','Online'], offline:['غير متصل','Offline'], warning:['تحذير','Warning'], search:['بحث برقم المستشعر أو المنطقة','Search sensor or zone'],
+  poleT:['عمود هبوب الذكي','Haboob Smart Pole'], poleP:['عمود استشعار بارتفاع 4.2 م يندمج مع لغة إكسبو المعمارية: تاج مستوحى من سعف النخيل، وحزام مشربية يحمي المستشعرات من الإشعاع المباشر.','A 4.2 m sensing pole that blends into Expo’s architecture: a palm-frond crown and a mashrabiya band that shields sensors from direct sun.'],
+  pTemp:['مستشعر الحرارة','Temperature sensor'], pHum:['مستشعر الرطوبة','Humidity sensor'], pWind:['مستشعر الرياح فوق الصوتي','Ultrasonic wind sensor'], pSolar:['مستشعر الإشعاع الشمسي','Solar radiation sensor'], pConn:['اتصال LoRaWAN و 5G','LoRaWAN + 5G link'], pLed:['حلقة مؤشر الحالة','Status light ring'],
+  pTempS:['±0.1° داخل غلاف مظلل','±0.1° in shaded housing'], pHumS:['0–100% رطوبة نسبية','0–100% RH'], pWindS:['بدون أجزاء متحركة','No moving parts'], pSolarS:['0–1800 W/m²','0–1800 W/m²'], pConnS:['تحديث كل 30 ثانية','30-second updates'], pLedS:['أخضر، كهرماني، أحمر','Green, amber, red'],
+  sensorId:['رقم المستشعر','Sensor ID'], lastUpd:['آخر تحديث','Last updated'], secAgo:['ث','s ago'], minAgo:['د','min ago'],
+  // map layers
+  layers:['طبقات الخريطة','Map layers'], lZones:['المناطق الخارجية','Outdoor zones'], lPoles:['أعمدة الاستشعار','Sensor poles'], lEvents:['مواقع الفعاليات','Event locations'], lShade:['مناطق التظليل','Shading areas'], lMist:['مناطق الرذاذ والتبريد','Misting & cooling'],
+  lZonesS:['24 منطقة بحالتها الحرارية','24 zones with thermal status'], lPolesS:['36 عمودًا، النبض يعني اتصالًا حيًا','36 poles, pulse means live link'], lEventsS:['فعاليات اليوم','Today’s events'], lShadeS:['مظلات ثابتة ومتحركة','Fixed and retractable shades'], lMistS:['يعمل حاليًا أو جاهز','Running or on standby'],
+  legend:['دليل الألوان','Legend'], expoMap:['مخطط إكسبو 2030 الرياض (تخيلي)','Expo 2030 Riyadh site plan (illustrative)'],
+  // zones page
+  zonesSub:['جميع المناطق الخارجية مرتبة حسب شدة الإجهاد الحراري.','All outdoor zones sorted by heat stress.'],
+  // settings
+  setSub:['التفضيلات، نظام التصميم، وبنية المنصة.','Preferences, design system and platform structure.'],
+  general:['عام','General'], designSystem:['نظام التصميم','Design system'], about:['بنية المنصة','Platform structure'],
+  theme:['المظهر','Appearance'], light:['فاتح','Light'], dark:['داكن','Dark'], system:['النظام','System'], language:['اللغة','Language'],
+  thresholds:['حدود حالة المناطق (UTCI)','Zone status thresholds (UTCI)'], notif:['الإشعارات','Notifications'], nCrit:['تنبيهات حرجة بالصوت','Sound for critical alerts'], nEvents:['مخاطر الفعاليات','Event risk alerts'], nSensors:['أعطال المستشعرات','Sensor faults'],
+  colors:['الألوان','Colors'], type:['الخطوط','Typography'], components:['المكونات','Components'], iaT:['هيكل المعلومات','Information architecture'], flowT:['مسار المستخدم الأساسي','Primary user flow'],
+  logout:['تسجيل الخروج','Sign out'],
+  guideT:['مسار العرض','Demo path'],
+  g1:['تسجيل الدخول','Sign in'], g2:['النظرة العامة','Overview'], g3:['فتح التنبيه الحرج','Open the critical alert'], g4:['تفاصيل المنطقة C','Zone C details'], g5:['اعتماد التوصية','Approve recommendation'], g6:['تأكيد التنفيذ','Confirmation'], g7:['المنطقة أصبحت 🟡','Zone now 🟡'],
+  newAlert:['تنبيه حرج جديد: المنطقة C','New critical alert: Zone C'], minutes:['دقيقة','min'], hrs:['ساعة','h'],
+};
+let LANG = 'ar';
+const t = k => (T[k] ? T[k][LANG==='ar'?0:1] : k);
+const L = o => (o && typeof o==='object' ? o[LANG] : o);
+
+/* ---------------- Icons ---------------- */
+const I = {
+  overview:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>',
+  map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>',
+  zones:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  events:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><circle cx="12" cy="15" r="1.6"/></svg>',
+  auto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 7.5l2.6 1.5M17.2 15l2.6 1.5M4.2 16.5 6.8 15M17.2 9l2.6-1.5"/><circle cx="12" cy="12" r="4"/></svg>',
+  analytics:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 16V10M11 16V5M16 16v-4M21 16V8"/></svg>',
+  sensor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V9"/><circle cx="12" cy="6" r="3"/><path d="M6.5 2.5a8 8 0 0 0 0 7M17.5 2.5a8 8 0 0 1 0 7"/><path d="M9 22h6"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  temp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg>',
+  hum:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7 6.3 8.4a8 8 0 1 0 11.4 0z"/></svg>',
+  wind:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2M17.5 8a2.5 2.5 0 1 1 2 4H2"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  gauge:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0z"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  mist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 4v2M12 3v3M17 4v2M5 10h14"/><path d="M7 14v1M12 13v2M17 14v1M9 19v1M15 19v1"/></svg>',
+  shade:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a10 8 0 0 1 20 0z"/><path d="M12 12v8a2 2 0 0 0 4 0"/></svg>',
+  snow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5M9 4l3 2 3-2M9 20l3-2 3 2"/></svg>',
+  fan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.8"/><path d="M12 10.2C12 6 13.5 3 16 3c2 0 2.5 2.5 1 4l-5 3.2M13.6 12.9c3.6 2.1 5.5 4.9 4.3 7-1 1.7-3.4.9-3.9-1.2l-.4-5.8M10.4 12.9c-3.6 2.1-6.9 2.3-8.2.1-1-1.7.9-3.3 2.9-2.8l5.3 2.7"/></svg>',
+  people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M2 21v-1a6 6 0 0 1 12 0v1M16 3.1a4 4 0 0 1 0 7.8M22 21v-1a6 6 0 0 0-4-5.7"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  wrench:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8z" transform="rotate(0)"/><path d="M14.7 6.3 9 1 3 7l5.3 5.7"/></svg>',
+  wifi:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12.6a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+};
+const logoSvg = (s=38)=>`<svg class="brand-mark" width="${s}" height="${s}" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="var(--ink)"/><path d="M9 30c6-6 12-6 18-1.5S38 32 41 27" fill="none" stroke="var(--sand)" stroke-width="3.2" stroke-linecap="round"/><path d="M9 22c5-4.5 10-4.5 15-1s10 3 15-1" fill="none" stroke="var(--bg)" stroke-width="3.2" stroke-linecap="round" opacity=".9"/><path d="M14 14.5c3.5-2.3 7-2.3 10.5 0" fill="none" stroke="var(--brand)" stroke-width="3.2" stroke-linecap="round"/><circle cx="34" cy="14" r="2.6" fill="var(--brand)"/></svg>`;
+
+/* ---------------- Mock data ---------------- */
+const ZN = [
+ ['A','الساحة المركزية','Central Plaza'],['B','حديقة الواحة','Oasis Garden'],['C','ساحة الشمس','Sun Court'],['D','ممشى الابتكار','Innovation Walk'],
+ ['E','ممشى الماء','Water Promenade'],['F','جادة الأمم','Nations Avenue'],['G','حديقة العائلة','Family Park'],['H','شرفة الفنون','Arts Terrace'],
+ ['I','البوابة الشمالية','North Gate'],['J','بستان النخيل','Palm Grove'],['K','المسرح المفتوح','Amphitheatre'],['L','ساحة المطاعم','Food Court'],
+ ['M','شارع السوق','Market Street'],['N','منطقة الأطفال','Kids Zone'],['O','حديقة المنحوتات','Sculpture Garden'],['P','البوابة الشرقية','East Gate'],
+ ['Q','الساحة الرياضية','Sports Plaza'],['R','استراحة الكثبان','Dune Lounge'],['S','ساحة الإعلام','Media Square'],['T','البوابة الجنوبية','South Gate'],
+ ['U','السوق المظلل','Shaded Souq'],['V','ممشى التراث','Heritage Walk'],['W','منصة الأفق','Sky Deck'],['X','البوابة الغربية','West Gate'],
+];
+// [temp °C, humidity %, wind m/s, solar W/m², UTCI °C, visitors]
+const MET = {
+ A:[42,31,1.6,810,41.0,1840],B:[36,34,3.4,420,29.4,620],C:[43,24,0.9,880,44.0,960],D:[39,28,2.2,690,36.8,710],
+ E:[35,46,2.8,380,28.6,540],F:[38,29,3.1,560,31.2,1320],G:[36,33,3.0,350,28.9,880],H:[37,30,2.6,470,30.4,410],
+ I:[37,27,3.8,520,30.1,1150],J:[34,38,2.9,260,27.2,390],K:[42,22,1.1,860,43.1,730],L:[41,27,1.5,760,40.2,1460],
+ M:[39,26,2.0,640,35.4,1090],N:[35,35,2.7,300,28.1,470],O:[37,28,3.2,500,30.8,260],P:[38,25,3.6,590,31.6,940],
+ Q:[38,24,2.5,610,31.9,330],R:[42,21,1.0,840,42.6,520],S:[37,29,2.9,480,30.6,610],T:[39,24,2.4,650,34.9,1010],
+ U:[34,36,1.8,190,27.8,800],V:[37,27,3.0,510,30.9,350],W:[36,23,4.6,560,29.7,280],X:[37,26,3.5,530,30.3,890],
+};
+const S = {
+  authed:false, route:'overview', param:null, selZone:'C', flash:null, popPole:null,
+  layers:{zones:true,poles:true,events:true,shade:true,mist:true},
+  alertFilter:'all', sensorFilter:'all', sensorQ:'', sysFilter:'all', setTab:'general',
+  clock:new Date(2030,10,14,14,18,0), guideMin:false, demoStep:0, theme:'system', notif:{crit:true,ev:true,sens:true},
+};
+S.zones = ZN.map(([id,ar,en])=>{const m=MET[id];return {id,name:{ar,en},temp:m[0],hum:m[1],wind:m[2],solar:m[3],utci:m[4],visitors:m[5],mitigated:false}});
+const Z = id => S.zones.find(z=>z.id===id);
+
+S.sensors = Array.from({length:36},(_,i)=>{
+  const z = S.zones[i%24], k = i>=24?1:0, j=(i*37)%10/10;
+  const id = 'HB-P'+String(i+1).padStart(2,'0');
+  let status='online', batt=Math.round(62+((i*53)%37)), last=Math.round(5+((i*17)%25));
+  if(id==='HB-P13'){status='offline';last=18*60;batt=41}
+  if(id==='HB-P07'){status='warning';batt=14}
+  if(id==='HB-P30'){status='warning';batt=19}
+  return {id,zone:z.id,k,temp:+(z.temp+(j-.5)*0.8).toFixed(1),hum:Math.round(z.hum+(j-.5)*3),wind:+(z.wind+(j-.5)*.4).toFixed(1),solar:Math.round(z.solar+(j-.5)*30),batt,status,last};
+});
+
+S.alerts = [
+  {id:'a1',sev:'crit',zone:'C',time:'14:12',type:'heat',status:'active',
+    title:{ar:'إجهاد حراري حرج',en:'Critical heat stress'},
+    problem:{ar:'وصل UTCI إلى 44° مع إشعاع شمسي 880 W/m² ورياح شبه ساكنة.',en:'UTCI reached 44° with 880 W/m² solar radiation and near-still air.'},
+    rec:{ar:'تفعيل التظليل والرذاذ فورًا.',en:'Activate shading and misting immediately.'}},
+  {id:'a2',sev:'heat',zone:'A',time:'14:05',type:'event',status:'active',ev:'e1',
+    title:{ar:'خطر على فعالية',en:'Event risk'},
+    problem:{ar:'العرض الثقافي مجدول الساعة 3:00 م في الساحة المركزية، ومن المتوقع إجهاد حراري قوي جدًا (UTCI 42°).',en:'Cultural Show is scheduled at 3:00 PM in Central Plaza with very strong heat stress expected (UTCI 42°).'},
+    rec:{ar:'نقل الفعالية إلى المنطقة B الساعة 5:30 م.',en:'Move the event to Zone B at 5:30 PM.'}},
+  {id:'a3',sev:'crit',zone:'R',time:'13:58',type:'heat',status:'active',
+    title:{ar:'إجهاد حراري متصاعد',en:'Rising heat stress'},
+    problem:{ar:'ارتفع UTCI بمقدار 3.1° خلال 40 دقيقة ويتوقع هبوب تجاوز 44° عند 15:00.',en:'UTCI rose 3.1° in 40 minutes; Haboob predicts it will pass 44° by 15:00.'},
+    rec:{ar:'تشغيل الرذاذ والمراوح الذكية.',en:'Start misting and smart fans.'}},
+  {id:'a4',sev:'cau',zone:'M',time:'13:40',type:'sensor',status:'active',
+    title:{ar:'عمود استشعار غير متصل',en:'Sensor pole offline'},
+    problem:{ar:'العمود HB-P13 لم يرسل بيانات منذ 18 دقيقة. القراءات الحالية تقديرية من الأعمدة المجاورة.',en:'Pole HB-P13 hasn’t reported for 18 minutes. Readings are being estimated from neighboring poles.'},
+    rec:{ar:'إرسال فريق الصيانة لفحص وحدة الاتصال.',en:'Dispatch maintenance to check the comms unit.'}},
+  {id:'a5',sev:'crit',zone:'K',time:'13:31',type:'heat',status:'progress',
+    title:{ar:'إجهاد حراري حرج',en:'Critical heat stress'},
+    problem:{ar:'UTCI عند 43.1°. الرذاذ يعمل منذ 13:31 والتأثير قيد المراقبة.',en:'UTCI at 43.1°. Misting running since 13:31, effect being monitored.'},
+    rec:{ar:'نشر المظلات المتحركة إذا لم ينخفض UTCI خلال 15 دقيقة.',en:'Deploy retractable shades if UTCI doesn’t drop within 15 minutes.'}},
+  {id:'a6',sev:'heat',zone:'L',time:'12:50',type:'heat',status:'resolved',
+    title:{ar:'إجهاد حراري مرتفع',en:'High heat stress'},
+    problem:{ar:'تجاوز UTCI 40° في ساحة المطاعم وقت الغداء.',en:'UTCI passed 40° in the Food Court at lunch.'},
+    rec:{ar:'تم نشر المظلات تلقائيًا وفق القاعدة.',en:'Shades deployed automatically by rule.'}},
+];
+
+S.events = [
+  {id:'e1',name:{ar:'العرض الثقافي',en:'Cultural Show'},zone:'A',time:'15:00',visitors:500,risk:'high',utci:42,opt:{zone:'B',time:'17:30',utci:31,reason:{ar:'إجهاد حراري متوقع أقل بـ 11°، ورياح أفضل (3.4 م/ث) وظل طبيعي من بستان النخيل بعد 5 م.',en:'11° lower expected heat stress, better wind (3.4 m/s), and natural shade from the palm grove after 5 PM.'}}},
+  {id:'e2',name:{ar:'عرض الصقور',en:'Falconry Demonstration'},zone:'R',time:'16:00',visitors:300,risk:'crit',utci:43,opt:{zone:'J',time:'18:00',utci:28,reason:{ar:'بستان النخيل يوفر ظلًا وتيار هواء ثابتًا، والطيور أيضًا تتأثر بالحرارة.',en:'Palm Grove offers shade and steady airflow — the falcons are heat-sensitive too.'}}},
+  {id:'e3',name:{ar:'مسيرة التراث السعودي',en:'Saudi Heritage Parade'},zone:'F',time:'16:30',visitors:1200,risk:'mod',utci:33,opt:{zone:'F',time:'17:45',utci:29.5,reason:{ar:'نفس المسار مع تأخير 75 دقيقة ليتزامن مع غروب الشمس وانخفاض الإشعاع.',en:'Same route, 75 minutes later to align with sunset and lower radiation.'}}},
+  {id:'e4',name:{ar:'حوار الاستدامة',en:'Sustainability Talk'},zone:'H',time:'17:00',visitors:200,risk:'low',utci:29,opt:null},
+  {id:'e5',name:{ar:'ورشة العلوم للأطفال',en:'Kids Science Workshop'},zone:'N',time:'18:00',visitors:150,risk:'low',utci:27,opt:null},
+  {id:'e6',name:{ar:'حفل أضواء الليل',en:'Night Light Concert'},zone:'K',time:'20:30',visitors:2500,risk:'low',utci:25,opt:null},
+];
+
+const SYS = ['misting','shading','coolingSys','fans'];
+const SYSI = {misting:I.mist,shading:I.shade,coolingSys:I.snow,fans:I.fan};
+S.devices = [];
+['C','K','R','A','L','D','M','B'].forEach(zid=>{
+  SYS.forEach(sys=>{
+    const d={id:zid+'-'+sys,zone:zid,sys,status:'off',mode:'auto',th:38,approval:true,last:{ar:'متوقف منذ 09:00',en:'Off since 09:00'}};
+    if(sys==='misting') d.th=38; if(sys==='shading') d.th=36; if(sys==='coolingSys') d.th=40; if(sys==='fans') d.th=37;
+    if(zid==='C'){d.mode='manual';d.last={ar:'أوقفه المشغل 11:20',en:'Stopped by operator 11:20'}}
+    if(zid==='K'&&sys==='misting'){d.status='on';d.last={ar:'اعتمدته سارة 13:31',en:'Approved by Sara 13:31'}}
+    if(zid==='L'&&sys==='shading'){d.status='on';d.approval=false;d.last={ar:'قاعدة تلقائية 12:50',en:'Auto rule 12:50'}}
+    if(zid==='A'&&sys==='shading'){d.status='on';d.approval=false;d.last={ar:'قاعدة تلقائية 12:10',en:'Auto rule 12:10'}}
+    if(zid==='A'&&sys==='misting'){d.status='pending';d.last={ar:'القاعدة تحققت 14:09',en:'Rule triggered 14:09'}}
+    if(zid==='B'&&sys==='fans'){d.status='on';d.approval=false;d.last={ar:'قاعدة تلقائية 13:00',en:'Auto rule 13:00'}}
+    S.devices.push(d);
+  });
+});
+const D = id => S.devices.find(d=>d.id===id);
+
+S.log = [
+  {t:'13:31',c:'brand',x:{ar:'تشغيل الرذاذ — المنطقة K',en:'Misting started — Zone K'},s:{ar:'توصية هبوب · اعتمدتها سارة العتيبي',en:'Haboob recommendation · approved by Sara Al-Otaibi'}},
+  {t:'13:00',c:'info',x:{ar:'تشغيل المراوح — المنطقة B',en:'Fans started — Zone B'},s:{ar:'قاعدة تلقائية: UTCI > 37°',en:'Auto rule: UTCI > 37°'}},
+  {t:'12:50',c:'info',x:{ar:'نشر المظلات — المنطقة L',en:'Shades deployed — Zone L'},s:{ar:'قاعدة تلقائية: UTCI > 36°',en:'Auto rule: UTCI > 36°'}},
+  {t:'11:45',c:'neutral',x:{ar:'استبدال بطارية HB-P22',en:'Battery replaced on HB-P22'},s:{ar:'فريق الصيانة',en:'Maintenance team'}},
+];
+
+/* ---------------- Derived ---------------- */
+const stOf = u => u>42?'crit':u>=38?'heat':u>=32?'cau':'ok';
+const catOf = u => u<26?0:u<32?1:u<38?2:u<46?3:4;
+const stColor = s => `var(--${s})`;
+const stBadge = s => `<span class="badge b-${s}"><span class="dot"></span>${t('st_'+s)}</span>`;
+const emojiSt = {ok:'🟢',cau:'🟡',heat:'🟠',crit:'🔴'};
+function counts(){
+  const c={ok:0,cau:0,heat:0,crit:0};
+  S.zones.forEach(z=>c[stOf(z.utci)]++);
+  return {...c,attn:c.cau+c.heat,alerts:S.alerts.filter(a=>a.status==='active').length};
+}
+const zn = id => `${LANG==='ar'?'المنطقة':'Zone'} ${id}`;
+const zfull = z => `${zn(z.id)} — ${L(z.name)}`;
+const clockStr = d => d.toTimeString().slice(0,5);
+
+function recFor(z){
+  const s=stOf(z.utci);
+  if(z.mitigated || s==='ok') return null;
+  if(z.id==='C'||z.id==='A'||z.id==='K'||s==='crit') return {
+    sys:['shading','misting'], title:{ar:'تفعيل التظليل + الرذاذ',en:'Activate Shading + Misting'},
+    why:{ar:'الإشعاع الشمسي المرتفع مع ضعف سرعة الرياح يرفعان الإجهاد الحراري في هذه المنطقة. التظليل يقطع معظم الإشعاع المباشر، والرذاذ يخفض حرارة الهواء المحيط بالزوار.',en:'High solar radiation combined with low wind speed is increasing thermal stress in this zone. Shading cuts most direct radiation; misting lowers the air temperature around visitors.'},
+    drop:+(z.utci-(z.id==='C'?36.4:z.utci-7)).toFixed(1), conf:z.id==='C'?94:89, water:120};
+  return {sys:['fans'],title:{ar:'تشغيل المراوح الذكية',en:'Start Smart Fans'},
+    why:{ar:'سرعة الرياح أقل من 2.5 م/ث. زيادة حركة الهواء تكفي لخفض UTCI دون استهلاك مياه.',en:'Wind is below 2.5 m/s. Increasing airflow is enough to lower UTCI without using water.'},
+    drop:3.2,conf:86,water:0};
+}
+function factorsFor(z){
+  const f=[
+    {k:'fSolar',v:Math.max(0,(z.solar-400)/80),c:'var(--heat)'},
+    {k:'fWind',v:Math.max(0,(3.2-z.wind)*1.4),c:'var(--cau)'},
+    {k:'fTemp',v:Math.max(0,(z.temp-34)*.55),c:'var(--crit)'},
+    {k:'fHum',v:Math.max(0,(z.hum-30)*.05),c:'var(--info)'},
+  ];
+  return f.map(x=>({...x,v:+x.v.toFixed(1)}));
+}
+
+/* ---------------- Charts (inline SVG) ---------------- */
+function lineChart({series,labels,yMin,yMax,h=230,w=640,thresh,forecastFrom,yUnit='°'}){
+  const pl=34,pr=10,pt=12,pb=26, iw=w-pl-pr, ih=h-pt-pb;
+  const x=i=>pl+i*(iw/(labels.length-1)), y=v=>pt+ih-(v-yMin)/(yMax-yMin)*ih;
+  let g='';
+  const ticks=5;
+  for(let i=0;i<=ticks;i++){const v=yMin+(yMax-yMin)*i/ticks;g+=`<line class="gl" x1="${pl}" x2="${w-pr}" y1="${y(v)}" y2="${y(v)}"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${Math.round(v)}${yUnit}</text>`}
+  labels.forEach((l,i)=>{if(l!=='')g+=`<text x="${x(i)}" y="${h-6}" text-anchor="middle">${l}</text>`});
+  if(thresh) g+=`<line x1="${pl}" x2="${w-pr}" y1="${y(thresh.v)}" y2="${y(thresh.v)}" stroke="var(--crit)" stroke-dasharray="4 4" stroke-width="1.2" opacity=".7"/>`;
+  if(forecastFrom!=null) g+=`<rect x="${x(forecastFrom)}" y="${pt}" width="${w-pr-x(forecastFrom)}" height="${ih}" fill="var(--sand-soft)" opacity=".6"/><text x="${x(forecastFrom)+6}" y="${pt+12}" style="fill:var(--sand-deep);font-weight:600">${t('predicted')}</text>`;
+  series.forEach(s=>{
+    const pts=s.data.map((v,i)=>v==null?null:[x(i),y(v)]);
+    let d='',fd='';
+    pts.forEach((p,i)=>{if(!p)return; if(forecastFrom!=null&&i>forecastFrom){fd+=(fd?'L':'M')+p.join(',')} else {d+=(d?'L':'M')+p.join(',')}
+      if(forecastFrom!=null&&i===forecastFrom) fd='M'+p.join(',')});
+    if(s.area){const first=pts.findIndex(p=>p),lastI=forecastFrom??pts.length-1;g+=`<path d="${d}L${x(lastI)},${pt+ih}L${x(first)},${pt+ih}Z" fill="${s.color}" opacity=".09"/>`}
+    g+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.w||2.2}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(fd) g+=`<path d="${fd}" fill="none" stroke="${s.color}" stroke-width="${s.w||2.2}" stroke-dasharray="5 5" stroke-linecap="round"/>`;
+    if(s.dotAt!=null){const p=pts[s.dotAt];g+=`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="var(--surface)" stroke="${s.color}" stroke-width="2.5"/>`}
+  });
+  return `<div class="chart"><svg viewBox="0 0 ${w} ${h}" role="img">${g}</svg></div>`;
+}
+function hBars(items,max,unit=''){
+  return items.map(it=>`<div class="factor" style="grid-template-columns:150px 1fr 56px"><span class="sm">${it.label}</span><div class="fb"><div style="width:${it.v/max*100}%;background:${it.c}"></div></div><span class="fv num">${it.v}${unit}</span></div>`).join('');
+}
+function legendRow(items){return `<div class="legend">${items.map(i=>`<span><i style="background:${i.c}"></i>${i.l}</span>`).join('')}</div>`}
+
+/* ---------------- Map ---------------- */
+const CX=400,CY=400;
+const pol=(r,a)=>[CX+r*Math.cos(a),CY+r*Math.sin(a)];
+function sector(r0,r1,a0,a1){
+  const large=(a1-a0)>Math.PI?1:0, p1=pol(r1,a0),p2=pol(r1,a1),p3=pol(r0,a1),p4=pol(r0,a0);
+  return `M${p1}A${r1},${r1} 0 ${large} 1 ${p2}L${p3}A${r0},${r0} 0 ${large} 0 ${p4}Z`;
+}
+const GEO={};
+(function(){
+  GEO.A={type:'c',r:92,mid:[CX,CY],ang:0};
+  const inner=S.zones.slice(1,8), outer=S.zones.slice(8);
+  const g1=.035,g2=.025;
+  inner.forEach((z,i)=>{const n=7,a0=-Math.PI/2+i*2*Math.PI/n+g1,a1=-Math.PI/2+(i+1)*2*Math.PI/n-g1;GEO[z.id]={type:'s',r0:108,r1:218,a0,a1,mid:pol(163,(a0+a1)/2),ang:(a0+a1)/2}});
+  outer.forEach((z,i)=>{const n=16,off=-Math.PI/2-Math.PI/16,a0=off+i*2*Math.PI/n+g2,a1=off+(i+1)*2*Math.PI/n-g2;GEO[z.id]={type:'s',r0:234,r1:352,a0,a1,mid:pol(293,(a0+a1)/2),ang:(a0+a1)/2}});
+})();
+function polePos(p){
+  const g=GEO[p.zone];
+  if(g.type==='c') return p.k?[CX+38,CY+34]:[CX-40,CY-30];
+  const a=g.a0+(g.a1-g.a0)*(p.k?0.78:0.22), r=g.r0+(g.r1-g.r0)*(p.k?0.75:0.3);
+  return pol(r,a);
+}
+function renderMap({full=false}={}){
+  const ly=full?S.layers:{zones:true,poles:true,events:false,shade:false,mist:true};
+  let s=`<svg viewBox="0 0 800 800" aria-label="${t('expoMap')}"><defs>
+    <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="var(--ink2)" stroke-width="1.6" opacity=".45"/></pattern>
+    <radialGradient id="ground" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="var(--surface)"/><stop offset="1" stop-color="var(--sand-soft)"/></radialGradient>
+  </defs>`;
+  // ground + dune contours (wind-swept)
+  s+=`<circle cx="400" cy="400" r="392" fill="url(#ground)" stroke="var(--line2)"/>`;
+  for(let i=0;i<9;i++){const yy=90+i*72;s+=`<path d="M40,${yy} C200,${yy-36} 300,${yy+30} 420,${yy-6} S640,${yy-30} 770,${yy+8}" fill="none" stroke="var(--sand)" stroke-width="1" opacity=".55" clip-path="circle(392px at 400px 400px)"/>`}
+  // circulation ring + axes
+  s+=`<circle cx="400" cy="400" r="226" fill="none" stroke="var(--line2)" stroke-width="5" opacity=".6"/>`;
+  s+=`<circle cx="400" cy="400" r="370" fill="none" stroke="var(--line2)" stroke-width="2" stroke-dasharray="2 6"/>`;
+  // zones
+  if(ly.zones){
+    S.zones.forEach(z=>{
+      const g=GEO[z.id], st=stOf(z.utci), sel=S.selZone===z.id&&!full?' sel':'';
+      const fill=`color-mix(in srgb,var(--${st}) ${st==='ok'?18:28}%,var(--surface))`;
+      const shape = g.type==='c'?`<circle cx="${CX}" cy="${CY}" r="${g.r}"`:`<path d="${sector(g.r0,g.r1,g.a0,g.a1)}"`;
+      s+=`<g data-act="zone" data-id="${z.id}" role="button" tabindex="0" aria-label="${zfull(z)}">`;
+      s+=`${shape} class="zone-shape${sel}" fill="${fill}" stroke="var(--${st})" stroke-width="${sel?3.2:1.6}"/>`;
+      if(st==='crit') s+=`${shape} class="crit-pulse" fill="var(--crit)" opacity=".3" pointer-events="none"/>`;
+      if(S.flash===z.id) s+=`${shape} class="flash-ring" fill="none" stroke="var(--ok)" pointer-events="none"/>`;
+      s+=`</g>`;
+      const [mx,my]=g.mid;
+      s+=`<text class="zone-label" x="${mx}" y="${my-2}" text-anchor="middle" font-size="${g.type==='c'?26:18}" fill="var(--ink)">${z.id}</text>`;
+      s+=`<text class="zone-label" x="${mx}" y="${my+(g.type==='c'?20:15)}" text-anchor="middle" font-size="${g.type==='c'?14:11.5}" fill="var(--${st})">${z.utci.toFixed(1)}°</text>`;
+    });
+  }
+  // shade areas
+  if(ly.shade){
+    ['U','J','E','A','L','G'].forEach(id=>{const g=GEO[id];
+      if(g.type==='c'){s+=`<circle cx="${CX}" cy="${CY}" r="${g.r-12}" fill="url(#hatch)" pointer-events="none" opacity=".5"/>`;return}
+      const a0=g.a0+(g.a1-g.a0)*.1,a1=g.a1-(g.a1-g.a0)*.1;s+=`<path d="${sector(g.r1-30,g.r1-8,a0,a1)}" fill="url(#hatch)" pointer-events="none"/>`});
+  }
+  // misting areas
+  if(ly.mist){
+    S.zones.forEach(z=>{
+      const on = S.devices.some(d=>d.zone===z.id&&(d.sys==='misting'||d.sys==='coolingSys')&&d.status==='on');
+      const g=GEO[z.id]; if(!on && !full) return;
+      if(!on && !['E','B','G','N'].includes(z.id)) return;
+      const [mx,my]= g.type==='c'?[CX+44,CY-44]:pol(g.r0+16,(g.a0+g.a1)/2);
+      s+=`<g pointer-events="none"><circle cx="${mx}" cy="${my}" r="11" fill="var(--info-bg)" stroke="var(--info)" stroke-width="1.5" ${on?'':'stroke-dasharray="3 3"'}/>`;
+      for(let k=0;k<3;k++) s+=`<circle cx="${mx-4+k*4}" cy="${my-2+(k%2)*4}" r="1.6" fill="var(--info)"/>`;
+      s+=`</g>`;
+    });
+  }
+  // events
+  if(ly.events){
+    S.events.forEach(e=>{const g=GEO[e.zone];const [mx,my]=g.type==='c'?[CX,CY-58]:pol(g.r1-14,g.a0+(g.a1-g.a0)*.5);
+      const c=e.risk==='crit'||e.risk==='high'?'var(--crit)':e.risk==='mod'?'var(--cau)':'var(--brand)';
+      s+=`<g data-act="goto" data-to="events" style="cursor:pointer"><rect x="${mx-11}" y="${my-11}" width="22" height="22" rx="6" fill="var(--surface)" stroke="${c}" stroke-width="2"/><path d="M${mx-5},${my-1}h10M${mx-5},${my+3}h6" stroke="${c}" stroke-width="2" stroke-linecap="round"/><title>${L(e.name)} · ${e.time}</title></g>`});
+  }
+  // poles
+  if(ly.poles){
+    S.sensors.forEach(p=>{
+      const [px,py]=polePos(p); const c=p.status==='online'?'var(--ok)':p.status==='warning'?'var(--cau)':'var(--ink3)';
+      s+=`<g class="pole" data-act="pole" data-id="${p.id}" role="button" tabindex="0" aria-label="${p.id}">`;
+      if(p.status!=='offline') s+=`<circle class="ring" cx="${px}" cy="${py}" r="5" fill="none" stroke="${c}" stroke-width="1.5" style="animation-delay:${(parseInt(p.id.slice(4))%7)*.3}s"/>`;
+      s+=`<circle cx="${px}" cy="${py}" r="${full?6:4.5}" fill="var(--surface)" stroke="${c}" stroke-width="2.4"/><circle cx="${px}" cy="${py}" r="${full?2.2:1.6}" fill="${c}"/></g>`;
+    });
+  }
+  // gates
+  [['N',400,18],['E',782,400],['S',400,786],['W',18,400]].forEach(([l,x,y])=>s+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="600" fill="var(--ink3)">${l}</text>`);
+  s+='</svg>';
+  let pop='';
+  if(S.popPole){const p=S.sensors.find(x=>x.id===S.popPole);const [px,py]=polePos(p);
+    pop=`<div class="map-pop" style="left:${px/8}%;top:${py/8}%"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><b class="num">${p.id}</b>${sensBadge(p.status)}</div>
+    <div class="faint" style="margin-top:2px">${zfull(Z(p.zone))}</div>
+    <div class="rows"><span>${t('temp')}</span><span class="num">${p.temp}°C</span><span>${t('hum')}</span><span class="num">${p.hum}%</span><span>${t('wind')}</span><span class="num">${p.wind} m/s</span><span>${t('solar')}</span><span class="num">${p.solar} W/m²</span><span>${t('lastUpd')}</span><span>${agoStr(p.last)}</span></div></div>`}
+  return `<div class="map-wrap" id="map">${s}${pop}</div>`;
+}
+const agoStr = sec => sec>=60?`<span class="num">${Math.round(sec/60)}</span> ${t('minAgo')}`:`<span class="num">${sec}</span> ${t('secAgo')}`;
+const sensBadge = s => `<span class="badge ${s==='online'?'b-ok':s==='warning'?'b-cau':'b-neutral'}"><span class="dot"></span>${t(s)}</span>`;
+
+/* ---------------- Layout ---------------- */
+const NAV=[['overview',I.overview],['map',I.map],['zones',I.zones],['alerts',I.alert],['events',I.events],['automation',I.auto],['analytics',I.analytics],['sensors',I.sensor],['settings',I.settings]];
+const navKey={overview:'overview',map:'liveMap',zones:'zones',alerts:'alerts',events:'events',automation:'automation',analytics:'analytics',sensors:'sensors',settings:'settings',zone:'zoneDetails'};
+
+function shell(content){
+  const c=counts(), offline=S.sensors.some(p=>p.status==='offline');
+  const cur=S.route==='zone'?'zones':S.route;
+  return `<div class="shell">
+  <aside class="side">
+    <div class="brand">${logoSvg()}<div class="brand-txt"><div class="brand-name">${LANG==='ar'?'هبوب':'HABOOB'}</div><div class="brand-sub">${t('appSub')}</div></div></div>
+    <nav class="nav">${NAV.map(([k,ic],i)=>`${i===7?'<div class="nav-sep"></div>':''}<a href="#/${k}" class="${cur===k?'on':''}" title="${t(navKey[k])}">${ic}<span class="lbl">${t(navKey[k])}</span>${k==='alerts'&&c.alerts?`<span class="count num">${c.alerts}</span>`:''}</a>`).join('')}</nav>
+    <div class="side-foot"><b>${t('loopTitle')}</b>${LANG==='ar'?'من البيانات إلى القرار إلى الإجراء.':'From data to decision to action.'}<div class="loop">${['sense','analyze','decide','act','learn'].map(k=>`<span>${t(k)}</span>`).join('')}</div></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div class="crumb">${t(navKey[S.route])}</div>
+      <span class="demo-tag">${t('demo')}</span>
+      <div class="spacer"></div>
+      <div class="sys"><span class="dot live" style="color:var(--${offline?'cau':'ok'});background:var(--${offline?'cau':'ok'})"></span>${offline?t('sysWarn'):t('sysOk')}</div>
+      <div class="clock"><span class="t num" id="clk">${clockStr(S.clock)}</span><span class="d">${t('demoDate')}</span></div>
+      <button class="icon-btn" data-act="goto" data-to="alerts" aria-label="${t('alerts')}">${I.bell}${c.alerts?'<span class="badge-dot"></span>':''}</button>
+      <button class="icon-btn" data-act="theme" aria-label="${t('theme')}">${I.moon}</button>
+      <div class="lang" role="group" aria-label="Language"><button class="${LANG==='ar'?'on':''}" data-act="lang" data-l="ar">ع</button><button class="${LANG==='en'?'on':''}" data-act="lang" data-l="en">EN</button></div>
+      <div class="user"><div class="avatar">${LANG==='ar'?'ن':'N'}</div><div><div class="n">${t('userName')}</div><div class="r">${t('userRole')}</div></div></div>
+    </header>
+    <main class="page fade-in" id="page">${content}</main>
+  </div></div>${guide()}`;
+}
+function guide(){
+  const steps=['g1','g2','g3','g4','g5','g6','g7'];
+  return `<div class="guide ${S.guideMin?'min':''}"><div class="guide-h"><span>${t('guideT')} <span class="faint num">${Math.min(S.demoStep+1,7)}/7</span></span><button class="btn-text btn-sm" style="border:0;background:none;padding:2px 4px" data-act="guide" aria-label="toggle">${S.guideMin?'+':'–'}</button></div>
+  <ol>${steps.map((k,i)=>`<li class="${i<S.demoStep?'done':i===S.demoStep?'cur':''}"><i>${i<S.demoStep?'✓':i+1}</i>${t(k)}</li>`).join('')}</ol></div>`;
+}
+const bumpStep = n => {if(S.demoStep<n) S.demoStep=n};
+
+/* ---------------- Pages ---------------- */
+function pageLogin(){
+  return `<div class="login">
+  <section class="login-art">
+    <svg class="wind" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      ${Array.from({length:10},(_,i)=>{const y=80+i*70;return `<path d="M-50,${y} C150,${y-50} 300,${y+40} 450,${y} S700,${y-40} 860,${y+10}" stroke="currentColor" stroke-width="1" opacity=".18"/><path class="w" d="M-50,${y} C150,${y-50} 300,${y+40} 450,${y} S700,${y-40} 860,${y+10}" stroke="currentColor" stroke-width="1.6" opacity=".45" style="animation-delay:${-i*1.1}s;animation-duration:${8+i%3*2}s"/>`}).join('')}
+    </svg>
+    <div style="position:relative;display:flex;align-items:center;gap:12px">${logoSvg(46)}<div><div style="font-weight:700;font-size:22px">هبوب | HABOOB</div><div style="font-size:13px;opacity:.75">Expo 2030 Riyadh</div></div></div>
+    <div class="lt"><h1>${t('loginH')}</h1><p>${t('loginP')}</p></div>
+    <div class="lb"><div><b class="num">24</b>${t('loginStat1')}</div><div><b class="num">36</b>${t('loginStat2')}</div><div><b class="num">30s</b>${t('loginStat3')}</div></div>
+  </section>
+  <section class="login-form">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:auto"><div class="lang"><button class="${LANG==='ar'?'on':''}" data-act="lang" data-l="ar">العربية</button><button class="${LANG==='en'?'on':''}" data-act="lang" data-l="en">English</button></div></div>
+    <form id="loginForm" novalidate>
+      <div><h1 style="font-size:28px">${t('welcome')}</h1><p class="muted" style="margin-top:6px">${t('welcomeP')}</p></div>
+      <div><label class="f" for="em">${t('email')}</label><input class="input num" style="display:block;text-align:start" id="em" type="email" value="noura.alqahtani@expo2030.sa" autocomplete="username"></div>
+      <div><label class="f" for="pw">${t('password')}</label><input class="input" id="pw" type="password" value="haboob-demo" autocomplete="current-password"></div>
+      <div class="row"><label class="check"><input type="checkbox" checked> ${t('remember')}</label><a href="#" style="color:var(--brand);text-decoration:none;font-weight:500" onclick="return false">${t('forgot')}</a></div>
+      <button class="btn btn-primary btn-lg" type="submit" id="loginBtn">${t('login')}</button>
+      <p class="faint sm" style="text-align:center">${t('ssoNote')}</p>
+    </form>
+    <div style="margin-top:auto"></div>
+  </section></div>`;
+}
+
+function kpiCards(){
+  const c=counts();
+  const k=[
+    ['kTotal',24,'var(--ink)','kTotalF',''],['kOk',c.ok,'var(--ok)','kOkF','ok'],['kAttn',c.attn,'var(--heat)','kAttnF','attn'],['kCrit',c.crit,'var(--crit)','kCritF','crit'],['kAlerts',c.alerts,'var(--crit)','kAlertsF','alerts']];
+  return `<div class="kpis">${k.map(([l,v,col,f,id])=>`<div class="card kpi ${S.kpiFlash&&id&&S.kpiFlash.includes(id)?'flash':''}"><span class="bar" style="background:${col}"></span><div class="k-label">${t(l)}</div><div class="k-val num" style="color:${id?col:'var(--ink)'}">${v}</div><div class="k-foot">${t(f)}</div></div>`).join('')}</div>`;
+}
+function zoneMetrics(z){
+  return `<div class="metric-grid">
+    ${[['temp',I.temp,z.temp,'°C'],['hum',I.hum,z.hum,'%'],['wind',I.wind,z.wind,'m/s'],['solar',I.sun,z.solar,'W/m²']].map(([k,ic,v,u])=>`<div class="metric"><div class="ml">${ic}${t(k)}</div><div class="mv"><span class="num">${v}</span><small>${u}</small></div></div>`).join('')}
+  </div>`;
+}
+function pageOverview(){
+  bumpStep(1);
+  const z=Z(S.selZone), st=stOf(z.utci);
+  const act=S.alerts.filter(a=>a.status==='active').sort((a,b)=>({crit:0,heat:1,cau:2,info:3}[a.sev]-{crit:0,heat:1,cau:2,info:3}[b.sev]));
+  const hrs=['12','13','14','15','16','17','18','19','20','21'];
+  const avg=[31.8,33.1,34.4,35.2,34.6,32.9,30.8,28.9,27.5,26.4];
+  return `
+  <div class="page-head"><div><h1>${t('ovTitle')}</h1><p class="muted">${t('ovSub')}</p></div></div>
+  ${kpiCards()}
+  <div class="ov-grid">
+    <div class="card">
+      <div class="card-head"><div><h2>${t('mapTitle')}</h2><p>${t('mapSub')}</p></div>${legendRow([{c:'var(--ok)',l:t('st_ok')},{c:'var(--cau)',l:t('st_cau')},{c:'var(--heat)',l:t('st_heat')},{c:'var(--crit)',l:t('st_crit')}])}</div>
+      <div style="padding:16px 20px 20px">${renderMap()}</div>
+    </div>
+    <div class="grid">
+      <div class="card quick" style="${st==='crit'?'border-color:color-mix(in srgb,var(--crit) 35%,var(--line))':''}">
+        <div class="quick-top"><div><div class="faint sm">${t('quickTitle')}</div><h2 style="margin-top:2px">${zfull(z)}</h2></div>${stBadge(st)}</div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:14px;gap:10px">
+          <div><div class="faint sm">${t('utci')}</div><div class="utci-hero"><span class="v num" style="color:var(--${st})">${z.utci.toFixed(1)}°</span></div><div class="sm muted">${t('cat'+catOf(z.utci))}</div></div>
+          <div class="sm faint" style="display:flex;align-items:center;gap:6px">${I.people.replace('<svg','<svg width="15" height="15"')}<span class="num">${z.visitors.toLocaleString('en')}</span> ${t('visitors')}</div>
+        </div>
+        ${zoneMetrics(z)}
+        <button class="btn ${st==='crit'?'btn-primary':'btn-ghost'}" style="width:100%;margin-top:14px" data-act="openzone" data-id="${z.id}">${t('openZone')}</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>${t('actNow')} <span class="faint num">(${act.length})</span></h3><button class="btn btn-text btn-sm" data-act="goto" data-to="alerts">${t('viewAll')}</button></div>
+        ${act.length?act.slice(0,3).map(a=>`<div class="alert-row ${S.newAlert===a.id?'fade-in':''}"><div class="sev ${a.sev}">${a.type==='event'?I.events:a.type==='sensor'?I.sensor:I.alert}</div><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;gap:8px"><b>${L(a.title)}</b><span class="faint sm num">${a.time}</span></div><div class="sm muted">${zfull(Z(a.zone))}</div></div><button class="btn btn-ghost btn-sm" data-act="alertgo" data-id="${a.id}">${a.type==='heat'?t('viewZone'):a.type==='event'?t('optimize'):t('dispatch')}</button></div>`).join(''):`<div class="empty">${t('noRec')}</div>`}
+      </div>
+    </div>
+  </div>
+  <div class="grid" style="grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);margin-top:18px">
+    <div class="card"><div class="card-head"><div><h3>${t('forecast')}</h3><p>${t('forecastSub')}</p></div><span class="badge b-ai">${I.spark.replace('<svg','<svg width="13" height="13"')} AI</span></div>
+      <div style="padding:16px 20px 18px">
+        ${lineChart({series:[{data:avg,color:'var(--heat)',area:true,dotAt:2}],labels:hrs.map(h=>h+':00'),yMin:24,yMax:38,h:200,forecastFrom:2,thresh:null})}
+        <div style="display:flex;gap:24px;margin-top:10px;font-size:13px"><span class="muted">${t('peakAt')}: <b class="num" style="color:var(--ink)">15:00 · 35.2°</b></span><span class="muted">${t('cooling')}: <b class="num" style="color:var(--ink)">17:30</b></span></div>
+      </div></div>
+    <div class="card"><div class="card-head"><div><h3>${t('activity')}</h3><p>${t('activitySub')}</p></div></div>
+      <ul class="log">${S.log.slice(0,5).map((l,i)=>`<li class="${l.isNew&&i===0?'new':''}"><span class="lt num">${l.t}</span><span class="ld" style="background:var(--${l.c==='neutral'?'ink3':l.c})"></span><span class="lx">${L(l.x)}<small>${L(l.s)}</small></span></li>`).join('')}</ul></div>
+  </div>`;
+}
+
+function pageMap(){
+  const layerDefs=[['zones','lZones','lZonesS',I.zones,'var(--ok)'],['poles','lPoles','lPolesS',I.sensor,'var(--brand)'],['events','lEvents','lEventsS',I.events,'var(--crit)'],['shade','lShade','lShadeS',I.shade,'var(--ink2)'],['mist','lMist','lMistS',I.mist,'var(--info)']];
+  const z=Z(S.selZone);
+  return `<div class="page-head"><div><h1>${t('liveMap')}</h1><p class="muted">${t('expoMap')}</p></div>${legendRow([{c:'var(--ok)',l:t('st_ok')},{c:'var(--cau)',l:t('st_cau')},{c:'var(--heat)',l:t('st_heat')},{c:'var(--crit)',l:t('st_crit')}])}</div>
+  <div class="ov-grid" style="grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr)">
+    <div class="card card-pad">${renderMap({full:true})}</div>
+    <div class="grid">
+      <div class="card"><div class="card-head"><h3>${t('layers')}</h3></div><div class="layer-list" style="padding:4px 14px 8px">
+        ${layerDefs.map(([k,l,s,ic,c])=>`<div class="layer"><span class="sw" style="background:color-mix(in srgb,${c} 14%,transparent);color:${c}">${ic}</span><div class="txt">${t(l)}<small>${t(s)}</small></div><button class="switch ${S.layers[k]?'on':''}" data-act="layer" data-k="${k}" aria-pressed="${S.layers[k]}" aria-label="${t(l)}"></button></div>`).join('')}
+      </div></div>
+      <div class="card quick"><div class="quick-top"><div><div class="faint sm">${t('quickTitle')}</div><h3 style="margin-top:2px">${zfull(z)}</h3></div>${stBadge(stOf(z.utci))}</div>
+        <div class="utci-hero" style="margin-top:10px"><span class="v num" style="font-size:36px;color:var(--${stOf(z.utci)})">${z.utci.toFixed(1)}°</span><span class="faint sm">UTCI</span></div>
+        ${zoneMetrics(z)}<button class="btn btn-ghost" style="width:100%;margin-top:14px" data-act="openzone" data-id="${z.id}">${t('openZone')}</button></div>
+    </div>
+  </div>`;
+}
+
+function pageZones(){
+  const zs=[...S.zones].sort((a,b)=>b.utci-a.utci);
+  return `<div class="page-head"><div><h1>${t('zones')}</h1><p class="muted">${t('zonesSub')}</p></div>${legendRow([{c:'var(--ok)',l:t('st_ok')},{c:'var(--cau)',l:t('st_cau')},{c:'var(--heat)',l:t('st_heat')},{c:'var(--crit)',l:t('st_crit')}])}</div>
+  <div class="card scroll-x"><table class="tbl"><thead><tr><th>${t('ev_zone')}</th><th>${t('status')}</th><th>UTCI</th><th>${t('temp')}</th><th>${t('hum')}</th><th>${t('wind')}</th><th>${t('solar')}</th><th>${t('visitorsNow')}</th><th></th></tr></thead><tbody>
+  ${zs.map(z=>{const st=stOf(z.utci);return `<tr class="click" data-act="openzone" data-id="${z.id}"><td><b>${zn(z.id)}</b> <span class="muted">${L(z.name)}</span></td><td>${stBadge(st)}</td><td><b class="num" style="color:var(--${st})">${z.utci.toFixed(1)}°</b></td><td class="num">${z.temp}°C</td><td class="num">${z.hum}%</td><td class="num">${z.wind} m/s</td><td class="num">${z.solar} W/m²</td><td class="num">${z.visitors.toLocaleString('en')}</td><td>${recFor(z)?`<span class="badge b-ai">${I.spark.replace('<svg','<svg width="12" height="12"')} ${LANG==='ar'?'توصية':'Rec.'}</span>`:''}</td></tr>`}).join('')}
+  </tbody></table></div>`;
+}
+
+function pageZone(){
+  const z=Z(S.param)||Z('C'); S.selZone=z.id;
+  if(z.id==='C') bumpStep(3);
+  const st=stOf(z.utci), cat=catOf(z.utci), rec=recFor(z), fac=factorsFor(z);
+  const pinPos=Math.min(98,Math.max(2, z.utci<26?(z.utci-9)/17*20: z.utci<32?20+(z.utci-26)/6*20 : z.utci<38?40+(z.utci-32)/6*20 : z.utci<46?60+(z.utci-38)/8*20 : 80+(z.utci-46)/8*20));
+  const hrs=['08','09','10','11','12','13','14','15','16','17','18','19','20'];
+  const base=z.utci, past=[base-12,base-9.5,base-7,base-4.8,base-2.9,base-1.2,base];
+  const fut=z.mitigated?[base,base-.4,base-1.2,base-2.6,base-4.5,base-6.6]:[base,base+.6,base-.3,base-2.4,base-5.2,base-7.9];
+  const series=[...past.slice(0,6),...fut].map(v=>+v.toFixed(1));
+  const devs=S.devices.filter(d=>d.zone===z.id);
+  const poles=S.sensors.filter(p=>p.zone===z.id);
+  const envFlag={solar:z.solar>650,wind:z.wind<2,temp:z.temp>40,hum:false};
+  const env=[['temp',I.temp,z.temp,'°C',envFlag.temp],['hum',I.hum,z.hum,'%',false],['wind',I.wind,z.wind,'m/s',envFlag.wind],['solar',I.sun,z.solar,'W/m²',envFlag.solar]];
+  const maxF=Math.max(8,...fac.map(f=>f.v));
+  return `
+  <div class="page-head">
+    <div><button class="btn btn-text btn-sm" style="padding-inline:0;margin-bottom:6px" data-act="back">${LANG==='ar'?I.arrow:I.back} ${t('back')}</button>
+      <h1>${zfull(z)}</h1><p class="muted" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span>${I.people.replace('<svg','<svg width="14" height="14" style="vertical-align:-2px"')} <span class="num">${z.visitors.toLocaleString('en')}</span> ${t('visitors')}</span><span>${I.sensor.replace('<svg','<svg width="14" height="14" style="vertical-align:-2px"')} ${poles.map(p=>p.id).join(', ')}</span></p></div>
+    ${stBadge(st)}
+  </div>
+  <div class="zd-hero">
+    <div class="card zd-status">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div class="muted sm">${t('thermalComfort')} · UTCI</div><div class="big num" id="utciBig" style="color:var(--${st})">${z.utci.toFixed(1)}<small>°C</small></div><div style="font-weight:600;margin-top:6px">${t('cat'+cat)}</div><div class="faint sm">${t('feelsLike')}</div></div>
+      <div style="text-align:end"><div class="faint sm">${t('temp')}</div><div class="num" style="font-size:22px;font-weight:600">${z.temp}°C</div><div class="faint sm" style="margin-top:6px">Δ UTCI</div><div class="num" style="font-size:15px;font-weight:600;color:var(--${z.utci>z.temp?'crit':'ok'})">${z.utci>z.temp?'+':''}${(z.utci-z.temp).toFixed(1)}°</div></div></div>
+      <div class="scale"><div class="scale-track"><div class="scale-pin" id="pin" style="left:${pinPos}%"></div></div><div class="scale-bar"><div></div><div></div><div></div><div></div><div></div></div>
+      <div class="scale-labels">${[0,1,2,3,4].map(i=>`<span class="${i===cat?'on':''}">${t('cat'+i)}<br><span class="num faint" style="font-weight:400">${['<26°','26–32°','32–38°','38–46°','>46°'][i]}</span></span>`).join('')}</div></div>
+    </div>
+    ${rec?`<div class="card rec" id="recCard"><div class="rec-in">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="badge b-ai">${I.spark.replace('<svg','<svg width="13" height="13"')} ${t('recTitle')}</span><span class="faint sm">${t('confidence')} <b class="num" style="color:var(--ink)">${rec.conf}%</b></span></div>
+      <div class="faint sm" style="margin-top:14px">${t('recAction')}</div>
+      <div class="ttl">${L(rec.title)}</div>
+      <p class="why">${L(rec.why)}</p>
+      <div class="impact"><div><b class="num" style="color:var(--ok)">−${rec.drop}°</b><span>${t('impUtci')}</span></div><div><b class="num">~6 ${t('minutes')}</b><span>${t('impTime')}</span></div><div><b class="num">${rec.water} L/h</b><span>${t('impWater')}</span></div></div>
+      <div class="acts"><button class="btn btn-primary btn-lg" data-act="activate" data-id="${z.id}">${t('activateNow')}</button><button class="btn btn-ghost btn-lg" data-act="schedule">${t('schedule')}</button><button class="btn btn-text btn-lg" data-act="dismiss">${t('dismiss')}</button></div>
+    </div></div>`:`<div class="card rec done"><div class="rec-in">
+      <span class="badge b-ok">${I.check.replace('<svg','<svg width="12" height="12"')} ${z.mitigated?t('recDone'):t('noRec')}</span>
+      <div class="ttl">${z.mitigated?L({ar:'التظليل + الرذاذ يعملان',en:'Shading + misting running'}):t('noRec')}</div>
+      <p class="why">${z.mitigated?t('recDoneP'):t('noRecP')}</p>
+      ${z.mitigated?`<div class="impact"><div><b class="num" style="color:var(--ok)">${z.prev.toFixed(1)}° → ${z.utci.toFixed(1)}°</b><span>UTCI</span></div><div><b>${stBadge(stOf(z.prev))}</b><span style="display:block;margin-top:4px">${LANG==='ar'?'الحالة السابقة':'Previous'}</span></div><div><b>${stBadge(st)}</b><span style="display:block;margin-top:4px">${LANG==='ar'?'الحالة الحالية':'Current'}</span></div></div>
+      <button class="btn btn-dark" data-act="goto" data-to="overview">${t('backOverview')}</button>`:''}
+    </div></div>`}
+  </div>
+  <h2 style="margin:4px 0 12px">${t('envCond')}</h2>
+  <div class="env-grid">${env.map(([k,ic,v,u,flag])=>`<div class="card env ${flag?'flagged':''}"><div class="el">${t(k)}${ic}</div><div class="ev"><span class="num">${v}</span> <small>${u}</small></div><div class="eh ${flag?'':'faint'}">${flag?(k==='wind'?t('belowNormal'):t('aboveNormal')):t('normal')}</div></div>`).join('')}</div>
+  <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)">
+    <div class="card"><div class="card-head"><div><h3>${t('whyTitle')}</h3><p>${t('whySub')}</p></div></div><div style="padding:12px 20px 18px">
+      ${fac.map(f=>`<div class="factor"><span class="sm">${t(f.k)}</span><div class="fb"><div style="width:${f.v/maxF*100}%;background:${f.c}"></div></div><span class="fv num">+${f.v}°</span></div>`).join('')}
+      ${!z.mitigated&&st!=='ok'?`<div class="factor"><span class="sm">${t('fShade')}</span><div class="fb"><div style="width:${2.4/maxF*100}%;background:var(--ink3)"></div></div><span class="fv num">+2.4°</span></div>`:''}
+    </div></div>
+    <div class="card"><div class="card-head"><div><h3>${t('trend12')}</h3></div>${legendRow([{c:`var(--${st})`,l:t('actual')+' / '+t('predicted')},{c:'var(--crit)',l:t('threshold')}])}</div>
+      <div style="padding:14px 20px 16px">${lineChart({series:[{data:series,color:`var(--${st})`,area:true,dotAt:6}],labels:hrs.map(h=>h),yMin:24,yMax:48,h:210,forecastFrom:6,thresh:{v:38}})}</div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><div class="card-head"><h3>${t('linked')}</h3><button class="btn btn-text btn-sm" data-act="goto" data-to="automation">${t('automation')}</button></div>
+    <div style="padding:4px 20px 8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));column-gap:24px">${devs.length?devs.map(d=>devRow(d)).join(''):`<div class="empty">—</div>`}</div></div>`;
+}
+function devStatusBadge(s){return s==='on'?`<span class="badge b-ok"><span class="dot"></span>${t('on')}</span>`:s==='pending'?`<span class="badge b-cau"><span class="dot"></span>${t('pending')}</span>`:`<span class="badge b-neutral"><span class="dot"></span>${t('off')}</span>`}
+function devRow(d){return `<div class="dev-row"><div class="dev-ic ${d.status==='on'?'on':''}">${SYSI[d.sys]}</div><div style="flex:1"><b>${t(d.sys)}</b><div class="faint sm">${t(d.mode)} · UTCI > ${d.th}°</div></div>${devStatusBadge(d.status)}</div>`}
+
+function pageAlerts(){
+  const f=S.alertFilter;
+  const list=S.alerts.filter(a=>f==='all'||a.status===f);
+  const n=k=>S.alerts.filter(a=>k==='all'||a.status===k).length;
+  return `<div class="page-head"><div><h1>${t('alerts')}</h1><p class="muted">${t('alertsSub')}</p></div>
+    <div class="chips">${[['all','all'],['active','active'],['progress','inProgress'],['resolved','resolved']].map(([k,l])=>`<button class="chip ${f===k?'on':''}" data-act="afilter" data-k="${k}">${t(l)} <span class="num">${n(k)}</span></button>`).join('')}</div></div>
+  <div class="grid" style="gap:12px">${list.map(a=>{
+    const z=Z(a.zone), sevCls=a.status==='resolved'?'resolved':a.sev;
+    const stB=a.status==='active'?`<span class="badge b-crit"><span class="dot"></span>${t('active')}</span>`:a.status==='progress'?`<span class="badge b-info"><span class="dot"></span>${t('inProgress')}</span>`:`<span class="badge b-ok"><span class="dot"></span>${t('resolved')}</span>`;
+    let acts='';
+    if(a.status==='active'){
+      if(a.type==='heat') acts=`<button class="btn btn-primary btn-sm" data-act="alertgo" data-id="${a.id}">${t('viewZone')}</button><button class="btn btn-ghost btn-sm" data-act="activate" data-id="${a.zone}">${t('activate')}</button>`;
+      if(a.type==='event') acts=`<button class="btn btn-primary btn-sm" data-act="optimize" data-id="${a.ev}">${t('optimize')}</button><button class="btn btn-ghost btn-sm" data-act="openzone" data-id="${a.zone}">${t('viewZone')}</button>`;
+      if(a.type==='sensor') acts=`<button class="btn btn-primary btn-sm" data-act="dispatch" data-id="${a.id}">${t('dispatch')}</button><button class="btn btn-ghost btn-sm" data-act="goto" data-to="sensors">${t('sensors')}</button>`;
+    } else acts=`<button class="btn btn-ghost btn-sm" data-act="openzone" data-id="${a.zone}">${t('viewZone')}</button>`;
+    return `<div class="card alert-card ${sevCls}"><div class="sev ${a.status==='resolved'?'ok':a.sev}">${a.type==='event'?I.events:a.type==='sensor'?I.sensor:I.alert}</div>
+      <div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3>${L(a.title)}</h3>${stB}</div>
+      <div class="meta"><span class="badge b-${a.sev==='info'?'info':a.sev}" style="padding:1px 8px">${t('sev_'+a.sev)}</span><span>${zfull(z)}</span><span class="num">${a.time}</span>${a.type==='heat'?`<span>UTCI <b class="num" style="color:var(--${stOf(z.utci)})">${z.utci.toFixed(1)}°</b></span>`:''}</div>
+      <p style="margin-top:8px">${L(a.problem)}</p>
+      <div class="rec-line">${I.spark}<span><b>${t('recommended')}:</b> ${L(a.rec)}</span></div></div>
+      <div class="acts">${acts}</div></div>`}).join('')||`<div class="card empty">—</div>`}</div>`;
+}
+
+const riskBadge = r => `<span class="badge ${r==='low'?'b-ok':r==='mod'?'b-cau':r==='high'?'b-heat':'b-crit'}"><span class="dot"></span>${t('risk_'+r)}</span>`;
+function pageEvents(){
+  return `<div class="page-head"><div><h1>${t('events')}</h1><p class="muted">${t('eventsSub')}</p></div><span class="demo-tag">${t('demoDate')}</span></div>
+  <div class="card scroll-x"><table class="tbl"><thead><tr><th>${t('ev_event')}</th><th>${t('ev_zone')}</th><th>${t('ev_date')}</th><th>${t('ev_time')}</th><th>${t('ev_vis')}</th><th>${t('ev_comfort')}</th><th>${t('ev_rec')}</th><th></th></tr></thead><tbody>
+  ${S.events.map(e=>`<tr><td><b>${L(e.name)}</b>${e.optimized?` <span class="badge b-ai" style="margin-inline-start:6px">${t('optimized')}</span>`:''}</td><td>${zn(e.zone)} <span class="faint sm">${L(Z(e.zone).name)}</span></td><td class="muted">14/11/2030</td><td class="num">${e.time}</td><td><span class="num">${e.visitors.toLocaleString('en')}</span> <span class="faint sm">${t('visitors')}</span></td><td>${riskBadge(e.risk)} <span class="faint sm num">UTCI ${e.utci}°</span></td>
+  <td class="sm">${e.opt&&!e.optimized?`${zn(e.opt.zone)} · <span class="num">${e.opt.time}</span>`:`<span class="faint">${t('keep')}</span>`}</td>
+  <td>${e.opt&&!e.optimized?`<button class="btn btn-primary btn-sm" data-act="optimize" data-id="${e.id}">${I.spark} ${t('optimize')}</button>`:''}</td></tr>`).join('')}
+  </tbody></table></div>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:18px">
+    ${[[I.spark,{ar:'هبوب يقارن كل فعالية بتوقعات UTCI لكل منطقة كل ساعة حتى 48 ساعة قادمة.',en:'Haboob checks every event against hourly UTCI forecasts for each zone up to 48 hours ahead.'}],[I.people,{ar:'الفعاليات التي يتجاوز جمهورها 1000 زائر تحصل على أولوية في خطط التظليل والرذاذ.',en:'Events above 1,000 visitors get priority in shading and misting plans.'}],[I.clock,{ar:'نافذة الراحة اليوم: بعد 5:30 م في معظم المناطق الغربية والشمالية.',en:'Today’s comfort window: after 5:30 PM in most western and northern zones.'}]].map(([ic,x])=>`<div class="insight"><div class="ii">${ic}</div><p class="sm">${L(x)}</p></div>`).join('')}
+  </div>`;
+}
+
+function pageAutomation(){
+  const f=S.sysFilter;
+  const pend=[...S.devices.filter(d=>d.status==='pending').map(d=>({kind:'rule',d})),
+    ...S.zones.filter(z=>stOf(z.utci)==='crit'&&!z.mitigated&&!S.devices.some(d=>d.zone===z.id&&d.status==='on')).map(z=>({kind:'ai',z}))];
+  const list=S.devices.filter(d=>f==='all'||d.sys===f);
+  return `<div class="page-head"><div><h1>${t('automation')}</h1><p class="muted">${t('autoSub')}</p></div></div>
+  <div class="card flow-strip" style="margin-bottom:18px">${['flow1','flow2','flow3','flow4'].map((k,i)=>`<div class="fs"><span class="num" style="${i===1?'background:var(--brand);color:var(--brand-ink)':''}">${i+1}</span>${t(k)}</div>${i<3?`<span class="arr">${I.arrow.replace('<svg','<svg width="16" height="16"')}</span>`:''}`).join('')}<span style="flex:1"></span><span class="faint sm">${LANG==='ar'?'القواعد المتكررة منخفضة المخاطر فقط تعمل دون اعتماد.':'Only low-risk repeat rules run without sign-off.'}</span></div>
+  <div class="sys-cards">${SYS.map(s=>{const ds=S.devices.filter(d=>d.sys===s),on=ds.filter(d=>d.status==='on').length;return `<div class="card sys-card ${f===s?'on':''}" data-act="sysf" data-k="${s}" role="button" tabindex="0"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="si">${SYSI[s]}</div><span class="faint sm">${s==='misting'?'<span class="num">'+on*120+'</span> L/h':s==='fans'||s==='coolingSys'?'<span class="num">'+(on*4.2).toFixed(1)+'</span> kW':''}</span></div><h3 style="margin-top:12px">${t(s)}</h3><div class="muted sm"><b class="num" style="color:var(--ink);font-size:18px">${on}</b> / <span class="num">${ds.length}</span> ${t('activeUnits')}</div></div>`}).join('')}</div>
+  ${pend.length?`<div class="card" style="margin-bottom:18px;border-color:color-mix(in srgb,var(--cau) 40%,var(--line))"><div class="card-head"><div><h3>${t('pendingTitle')} <span class="num faint">(${pend.length})</span></h3><p>${t('pendingSub')}</p></div></div>
+  ${pend.map(p=>p.kind==='rule'?`<div class="pending"><div class="dev-ic">${SYSI[p.d.sys]}</div><div style="flex:1"><b>${t(p.d.sys)} — ${zn(p.d.zone)}</b><div class="sm muted">${LANG==='ar'?'تحققت القاعدة':'Rule triggered'}: UTCI ${Z(p.d.zone).utci.toFixed(1)}° > ${p.d.th}° · ${L(p.d.last)}</div></div><button class="btn btn-ghost btn-sm" data-act="reject" data-id="${p.d.id}">${t('reject')}</button><button class="btn btn-primary btn-sm" data-act="approveDev" data-id="${p.d.id}">${t('approveBtn')}</button></div>`
+   :`<div class="pending"><div class="dev-ic" style="background:var(--brand-soft);color:var(--brand)">${I.spark}</div><div style="flex:1"><b>${L(recFor(p.z).title)} — ${zn(p.z.id)}</b><div class="sm muted">${t('recTitle')} · UTCI ${p.z.utci.toFixed(1)}° · ${t('confidence')} ${recFor(p.z).conf}%</div></div><button class="btn btn-ghost btn-sm" data-act="openzone" data-id="${p.z.id}">${t('viewZone')}</button><button class="btn btn-primary btn-sm" data-act="activate" data-id="${p.z.id}">${t('approveBtn')}</button></div>`).join('')}</div>`:''}
+  <div class="card scroll-x"><div class="card-head"><h3>${t('devices')}</h3><div class="chips"><button class="chip ${f==='all'?'on':''}" data-act="sysf" data-k="all">${t('all')}</button>${SYS.map(s=>`<button class="chip ${f===s?'on':''}" data-act="sysf" data-k="${s}">${t(s)}</button>`).join('')}</div></div>
+  <table class="tbl"><thead><tr><th>${t('d_system')}</th><th>${t('d_zone')}</th><th>${t('d_status')}</th><th>${t('d_mode')}</th><th>${t('d_trigger')}</th><th>${t('d_last')}</th><th></th></tr></thead><tbody>
+  ${list.map(d=>`<tr><td><div style="display:flex;align-items:center;gap:10px"><div class="dev-ic ${d.status==='on'?'on':''}" style="width:30px;height:30px">${SYSI[d.sys]}</div><b>${t(d.sys)}</b></div></td><td><span style="display:inline-flex;align-items:center;gap:8px"><span class="dot" style="background:var(--${stOf(Z(d.zone).utci)})"></span>${zn(d.zone)} <span class="num faint sm">${Z(d.zone).utci.toFixed(1)}°</span></span></td><td>${devStatusBadge(d.status)}</td>
+  <td><div class="seg"><button class="${d.mode==='auto'?'on':''}" data-act="mode" data-id="${d.id}" data-m="auto">${t('auto')}</button><button class="${d.mode==='manual'?'on':''}" data-act="mode" data-id="${d.id}" data-m="manual">${t('manual')}</button></div></td>
+  <td class="sm"><span class="num">UTCI > ${d.th}°</span>${d.approval?`<div class="faint" style="font-size:11.5px">${t('requireApproval')}</div>`:''}</td><td class="sm muted">${L(d.last)}</td>
+  <td style="white-space:nowrap">${d.status==='on'?`<button class="btn btn-ghost btn-sm" data-act="devoff" data-id="${d.id}">${t('turnOff')}</button>`:`<button class="btn btn-dark btn-sm" data-act="devon" data-id="${d.id}">${t('turnOn')}</button>`} <button class="btn btn-text btn-sm" data-act="config" data-id="${d.id}">${t('configure')}</button></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+function pageAnalytics(){
+  const hrs=Array.from({length:17},(_,i)=>i+7);
+  const curve=(peak,shift=0,amp=13)=>hrs.map(h=>+(peak-amp+amp*Math.exp(-Math.pow((h-14.5-shift)/3.6,2))).toFixed(1));
+  const perf=[['C',31],['K',27],['R',25],['A',21],['L',17],['D',11],['M',8],['T',6],['B',0]];
+  const days=T.days[LANG==='ar'?0:1];
+  const heatCols=['#F3EBDA','#EBD7A6','#E3B56B','#D9853F','#C2502C','#8E1F1A'];
+  const cell=(d,h)=>{const v=27+11*Math.exp(-Math.pow((h-14.5)/3,2))+((d*7+h)%5)*.5+(d===5?1.5:0);return v<29?0:v<31?1:v<33?2:v<35?3:v<37?4:5};
+  const phrs=Array.from({length:14},(_,i)=>i+9);
+  const water=[[4.1,6.8],[4.4,6.8],[3.9,6.8],[4.6,6.8],[4.2,6.8],[4.8,6.8],[4.3,6.8]];
+  const energy=[[1.9,2.7],[2.0,2.7],[1.8,2.7],[2.1,2.7],[2.0,2.7],[2.3,2.7],[2.0,2.7]];
+  const pair=(arr,max,u)=>`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:150px;direction:ltr">${arr.map((v,i)=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end"><div style="display:flex;gap:3px;align-items:flex-end;height:120px;width:100%;justify-content:center"><div title="${v[1]} ${u}" style="width:38%;height:${v[1]/max*100}%;background:var(--line2);border-radius:4px 4px 0 0"></div><div title="${v[0]} ${u}" style="width:38%;height:${v[0]/max*100}%;background:var(--brand);border-radius:4px 4px 0 0"></div></div><span class="faint" style="font-size:11px">${days[i]}</span></div>`).join('')}</div>`;
+  const ws=Math.round((1-water.reduce((a,b)=>a+b[0],0)/water.reduce((a,b)=>a+b[1],0))*100);
+  const es=Math.round((1-energy.reduce((a,b)=>a+b[0],0)/energy.reduce((a,b)=>a+b[1],0))*100);
+  return `<div class="page-head"><div><h1>${t('analytics')}</h1><p class="muted">${t('anSub')}</p></div><span class="demo-tag">${t('demo')} · 8–14/11/2030</span></div>
+  <div class="grid" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+    <div class="card"><div class="card-head"><div><h3>${t('trendsT')}</h3><p>${t('trendsS')}</p></div>${legendRow([{c:'var(--crit)',l:zn('C')},{c:'var(--heat)',l:zn('A')},{c:'var(--ok)',l:zn('B')}])}</div>
+      <div style="padding:14px 20px 16px">${lineChart({series:[{data:curve(44.5),color:'var(--crit)'},{data:curve(41.2,.3,12),color:'var(--heat)'},{data:curve(32,-.4,9),color:'var(--ok)'}],labels:hrs.map(h=>h%2?'':h+':00'),yMin:20,yMax:48,h:240,thresh:{v:38}})}</div></div>
+    <div class="card"><div class="card-head"><div><h3>${t('zonePerfT')}</h3><p>${t('zonePerfS')}</p></div></div>
+      <div style="padding:10px 20px 16px">${hBars(perf.map(([id,v])=>({label:`${zn(id)} · ${L(Z(id).name)}`,v,c:v>20?'var(--crit)':v>10?'var(--heat)':v>0?'var(--cau)':'var(--ok)'})),35,' '+t('hrs'))}</div></div>
+  </div>
+  <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-top:18px">
+    <div class="card"><div class="card-head"><div><h3>${t('peakT')}</h3><p>${t('peakS')}</p></div></div>
+      <div style="padding:16px 20px 18px"><div style="display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:center;direction:ltr">
+        ${days.map((d,di)=>`<span class="faint" style="font-size:11.5px;text-align:right">${d}</span><div class="heat-grid" style="grid-template-columns:repeat(${phrs.length},1fr)">${phrs.map(h=>`<div title="${d} ${h}:00" style="background:${heatCols[cell(di,h)]}"></div>`).join('')}</div>`).join('')}
+        <span></span><div class="heat-grid" style="grid-template-columns:repeat(${phrs.length},1fr)">${phrs.map(h=>`<span class="faint" style="font-size:10.5px;text-align:center">${h%3===0?h:''}</span>`).join('')}</div>
+      </div><div style="display:flex;align-items:center;gap:6px;margin-top:12px;font-size:11.5px" class="faint"><span>27°</span>${heatCols.map(c=>`<i style="width:22px;height:10px;border-radius:3px;background:${c};display:inline-block"></i>`).join('')}<span>38°+</span></div></div></div>
+    <div class="card"><div class="card-head"><div><h3>${t('resT')}</h3><p>${t('resS')}</p></div>${legendRow([{c:'var(--brand)',l:t('haboobOps')},{c:'var(--line2)',l:t('baseline')}])}</div>
+      <div style="padding:14px 20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div><div style="display:flex;justify-content:space-between;align-items:baseline"><b>${t('water')} <span class="faint sm">m³ × 100</span></b><span class="badge b-ok num">−${ws}%</span></div>${pair(water,7.5,'×100 m³')}</div>
+        <div><div style="display:flex;justify-content:space-between;align-items:baseline"><b>${t('energy')} <span class="faint sm">MWh</span></b><span class="badge b-ok num">−${es}%</span></div>${pair(energy,3,'MWh')}</div>
+      </div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><div class="card-head"><h3>${t('effT')}</h3></div><div style="padding:16px 20px 20px" class="stat-row">
+    <div class="stat"><b class="num">142</b><span>${t('interventions')}</span></div><div class="stat"><b class="num">87%</b><span>${t('approvedRate')}</span></div><div class="stat"><b class="num">2.4 ${t('minutes')}</b><span>${t('respTime')}</span></div><div class="stat"><b class="num">61</b><span>${t('autoRuns')}</span></div>
+  </div></div>
+  <h2 style="margin:24px 0 12px">${t('insights')}</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+    ${[{ar:'المنطقة C تتعرض لإجهاد حراري مرتفع بين 1:00 م و 4:00 م يوميًا، بمتوسط UTCI يبلغ 43.2°.',en:'Zone C experiences high thermal stress between 1:00 PM and 4:00 PM daily, averaging UTCI 43.2°.'},
+       {ar:'المنطقة B توفر أفضل راحة خارجية بعد 5:00 م، وهي الخيار الأول لنقل الفعاليات المسائية.',en:'Zone B provides the best outdoor comfort after 5:00 PM — first choice for relocating evening events.'},
+       {ar:`الرذاذ المؤتمت وفق UTCI خفّض استهلاك المياه غير الضروري بنسبة ${ws}% مقارنة بالجدول الثابت.`,en:`UTCI-driven automated misting cut unnecessary water use by ${ws}% vs. the fixed schedule.`},
+       {ar:'الرياح الشمالية الغربية بعد 4:30 م تخفض UTCI بمقدار 3° في المناطق I و X و W؛ يمكن إيقاف المراوح هناك مبكرًا.',en:'North-westerly winds after 4:30 PM lower UTCI by 3° in zones I, X and W — fans there can switch off earlier.'},
+       {ar:'الخميس هو الأعلى حرارة هذا الأسبوع بفارق 1.5°؛ ينصح بزيادة جاهزية فرق الدعم الميداني.',en:'Thursday ran 1.5° hotter than the rest of the week — consider extra field-support readiness.'},
+       {ar:'87% من توصيات هبوب اعتمدها المشغلون، و 9 من كل 10 خفضت UTCI إلى ما دون 38° خلال 10 دقائق.',en:'Operators approved 87% of Haboob recommendations; 9 in 10 brought UTCI below 38° within 10 minutes.'}]
+      .map((x,i)=>`<div class="insight"><div class="ii">${[I.sun,I.wind,I.mist,I.wind,I.temp,I.check][i]}</div><p class="sm">${L(x)}</p></div>`).join('')}
+  </div>`;
+}
+
+function poleSvg(){
+  return `<svg viewBox="0 0 240 440" aria-label="${t('poleT')}">
+    <defs><linearGradient id="pg" x1="0" x2="1"><stop offset="0" stop-color="var(--sand-deep)"/><stop offset=".5" stop-color="var(--sand)"/><stop offset="1" stop-color="var(--sand-deep)"/></linearGradient>
+    <pattern id="mash" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M5 0 10 5 5 10 0 5z" fill="none" stroke="var(--surface)" stroke-width="1.2" opacity=".8"/></pattern></defs>
+    <ellipse cx="120" cy="420" rx="62" ry="9" fill="var(--line2)" opacity=".6"/>
+    <rect x="96" y="398" width="48" height="20" rx="4" fill="var(--ink)" opacity=".85"/>
+    <path d="M110 400 L113 120 L127 120 L130 400 Z" fill="url(#pg)"/>
+    <rect x="101" y="230" width="38" height="70" rx="8" fill="var(--sand-deep)"/><rect x="101" y="230" width="38" height="70" rx="8" fill="url(#mash)"/>
+    <rect x="104" y="196" width="32" height="12" rx="6" fill="var(--brand)" opacity=".85"><animate attributeName="opacity" values=".5;1;.5" dur="2.4s" repeatCount="indefinite"/></rect>
+    <rect x="98" y="150" width="44" height="36" rx="10" fill="var(--surface)" stroke="var(--sand-deep)" stroke-width="2"/>
+    <circle cx="111" cy="168" r="5" fill="var(--heat)"/><circle cx="129" cy="168" r="5" fill="var(--info)"/>
+    ${[-62,-38,-14,14,38,62].map(a=>`<path d="M120 118 Q ${120+Math.sin(a*Math.PI/180)*60} ${100-Math.cos(a*Math.PI/180)*30} ${120+Math.sin(a*Math.PI/180)*92} ${118-Math.cos(a*Math.PI/180)*30+28}" fill="none" stroke="var(--sand-deep)" stroke-width="5" stroke-linecap="round"/>`).join('')}
+    <ellipse cx="120" cy="92" rx="40" ry="8" fill="var(--ink)"/><rect x="88" y="80" width="64" height="8" rx="4" fill="var(--info)" opacity=".75"/>
+    <rect x="117" y="56" width="6" height="24" fill="var(--ink2)"/><path d="M104 56 h32 M108 50 h24" stroke="var(--ink2)" stroke-width="3" stroke-linecap="round"/>
+    <g font-size="10.5" fill="var(--ink2)" font-family="inherit">
+      <line x1="136" y1="53" x2="200" y2="40" stroke="var(--ink3)"/><text x="202" y="43">1</text>
+      <line x1="152" y1="84" x2="200" y2="80" stroke="var(--ink3)"/><text x="202" y="83">2</text>
+      <line x1="142" y1="168" x2="200" y2="160" stroke="var(--ink3)"/><text x="202" y="163">3</text>
+      <line x1="136" y1="202" x2="200" y2="210" stroke="var(--ink3)"/><text x="202" y="213">4</text>
+      <line x1="139" y1="265" x2="200" y2="270" stroke="var(--ink3)"/><text x="202" y="273">5</text>
+    </g></svg>`;
+}
+function pageSensors(){
+  const f=S.sensorFilter, q=S.sensorQ.trim().toLowerCase();
+  const list=S.sensors.filter(p=>(f==='all'||p.status===f)&&(!q||p.id.toLowerCase().includes(q)||p.zone.toLowerCase()===q||L(Z(p.zone).name).toLowerCase().includes(q)));
+  const n=k=>S.sensors.filter(p=>k==='all'||p.status===k).length;
+  const specs=[['pWind','pWindS'],['pSolar','pSolarS'],['pTemp','pTempS'],['pLed','pLedS'],['pHum','pHumS'],['pConn','pConnS']];
+  return `<div class="page-head"><div><h1>${t('sensors')}</h1><p class="muted">${t('sensSub')}</p></div></div>
+  <div class="card card-pad" style="margin-bottom:18px"><div class="pole-art">${poleSvg()}<div><span class="badge b-ai">Concept</span><h2 style="margin:10px 0 6px;font-size:22px">${t('poleT')}</h2><p class="muted" style="max-width:62ch">${t('poleP')}</p>
+    <div class="pole-spec" style="margin-top:16px">${specs.map(([a,b],i)=>`<div><b><span class="num faint">${i+1}</span>&nbsp; ${t(a)}</b><span>${t(b)}</span></div>`).join('')}</div></div></div></div>
+  <div class="card scroll-x"><div class="card-head" style="flex-wrap:wrap"><div class="chips">${['all','online','warning','offline'].map(k=>`<button class="chip ${f===k?'on':''}" data-act="sfilter" data-k="${k}">${t(k)} <span class="num">${n(k)}</span></button>`).join('')}</div>
+    <input class="input" id="sq" style="max-width:280px;padding:8px 12px" placeholder="${t('search')}" value="${S.sensorQ.replace(/"/g,'')}"></div>
+  <table class="tbl"><thead><tr><th>${t('s_id')}</th><th>${t('ev_zone')}</th><th>${t('temp')}</th><th>${t('hum')}</th><th>${t('wind')}</th><th>${t('solar')}</th><th>${t('s_batt')}</th><th>${t('s_conn')}</th><th>${t('s_last')}</th></tr></thead><tbody>
+  ${list.map(p=>{const off=p.status==='offline';const bc=p.batt<20?'var(--crit)':p.batt<45?'var(--cau)':'var(--ok)';return `<tr class="click" data-act="openzone" data-id="${p.zone}"><td><b class="num">${p.id}</b></td><td>${zn(p.zone)} <span class="faint sm">${L(Z(p.zone).name)}</span></td><td class="num ${off?'faint':''}">${off?'—':p.temp+'°C'}</td><td class="num ${off?'faint':''}">${off?'—':p.hum+'%'}</td><td class="num ${off?'faint':''}">${off?'—':p.wind+' m/s'}</td><td class="num ${off?'faint':''}">${off?'—':p.solar+' W/m²'}</td><td><span class="batt" style="--w:${Math.round(p.batt*.2)}px;--c:${bc}"><i></i><span class="num sm">${p.batt}%</span></span></td><td>${sensBadge(p.status)}</td><td class="sm muted">${agoStr(p.last)}</td></tr>`}).join('')||`<tr><td colspan="9" class="empty">—</td></tr>`}
+  </tbody></table></div>`;
+}
+
+function pageSettings(){
+  const tab=S.setTab;
+  let body='';
+  if(tab==='general') body=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+    <div class="card card-pad"><h3>${t('theme')}</h3><div class="seg" style="margin-top:12px">${['light','dark','system'].map(k=>`<button class="${S.theme===k?'on':''}" data-act="setTheme" data-k="${k}">${t(k)}</button>`).join('')}</div>
+      <h3 style="margin-top:22px">${t('language')}</h3><div class="seg" style="margin-top:12px"><button class="${LANG==='ar'?'on':''}" data-act="lang" data-l="ar">العربية</button><button class="${LANG==='en'?'on':''}" data-act="lang" data-l="en">English</button></div></div>
+    <div class="card card-pad"><h3>${t('thresholds')}</h3><div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+      ${[['ok','< 32°'],['cau','32° – 38°'],['heat','38° – 42°'],['crit','> 42°']].map(([s,r])=>`<div style="display:flex;justify-content:space-between;align-items:center">${stBadge(s)}<span class="num">${r}</span></div>`).join('')}</div></div>
+    <div class="card card-pad"><h3>${t('notif')}</h3><div style="margin-top:8px">${[['crit','nCrit'],['ev','nEvents'],['sens','nSensors']].map(([k,l])=>`<div class="layer"><div class="txt">${t(l)}</div><button class="switch ${S.notif[k]?'on':''}" data-act="notif" data-k="${k}" aria-label="${t(l)}"></button></div>`).join('')}</div>
+      <button class="btn btn-ghost" style="margin-top:16px" data-act="logout">${I.logout} ${t('logout')}</button></div></div>`;
+  if(tab==='ds') body=`<div class="grid">
+    <div class="card card-pad"><h3>${t('colors')}</h3><div class="swatches" style="margin-top:14px">${[['--bg','Sand mist'],['--surface','Surface'],['--sand','Dune'],['--sand-deep','Dune deep'],['--ink','Charcoal'],['--brand','Oasis green'],['--ok','Comfortable'],['--cau','Caution'],['--heat','Heat stress'],['--crit','Critical'],['--info','Water / misting']].map(([v,n])=>`<div class="swatch"><div style="background:var(${v})"></div><p><b>${n}</b><span class="faint num">${v}</span></p></div>`).join('')}</div></div>
+    <div class="card card-pad"><h3>${t('type')}</h3><p class="faint sm" style="margin-top:4px">IBM Plex Sans Arabic — 300/400/500/600/700</p>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px"><div style="font-size:44px;font-weight:600;line-height:1" class="num">44.0°</div><div style="font-size:26px;font-weight:600">${LANG==='ar'?'عنوان الصفحة 26':'Page title 26'}</div><div style="font-size:18px;font-weight:600">${LANG==='ar'?'عنوان القسم 18':'Section title 18'}</div><div>${LANG==='ar'?'نص أساسي 14 — يُقرأ بسهولة على شاشات مركز العمليات.':'Body 14 — legible on operations-center screens.'}</div><div class="sm faint">${LANG==='ar'?'نص مساعد 12.5':'Caption 12.5'}</div></div></div>
+    <div class="card card-pad"><h3>${t('components')}</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center"><button class="btn btn-primary">${t('activateNow')}</button><button class="btn btn-dark">${t('turnOn')}</button><button class="btn btn-ghost">${t('schedule')}</button><button class="btn btn-text">${t('dismiss')}</button><button class="btn btn-danger btn-sm">${t('reject')}</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${['ok','cau','heat','crit'].map(stBadge).join('')}<span class="badge b-ai">${I.spark.replace('<svg','<svg width="12" height="12"')} AI</span>${sensBadge('online')}${sensBadge('warning')}${sensBadge('offline')}</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;align-items:center"><div class="seg"><button class="on">${t('auto')}</button><button>${t('manual')}</button></div><button class="switch on" aria-label="demo"></button><button class="switch" aria-label="demo"></button><div class="chips"><span class="chip on">${t('all')}</span><span class="chip">${t('active')}</span></div><input class="input" style="max-width:220px" placeholder="${t('search')}"></div>
+      <div style="display:flex;gap:18px;margin-top:16px;align-items:center"><svg width="120" height="30" viewBox="0 0 120 30">${[['ok',15],['cau',45],['heat',75],['crit',105]].map(([s,x])=>`<circle cx="${x}" cy="15" r="9" fill="color-mix(in srgb,var(--${s}) 28%,var(--surface))" stroke="var(--${s})" stroke-width="2"/>`).join('')}</svg><svg width="40" height="30" viewBox="0 0 40 30"><circle cx="20" cy="15" r="6" fill="var(--surface)" stroke="var(--ok)" stroke-width="2.4"/><circle cx="20" cy="15" r="2.2" fill="var(--ok)"/></svg><span class="faint sm">${LANG==='ar'?'علامات الخريطة: المناطق وأعمدة الاستشعار':'Map markers: zones and sensor poles'}</span></div>
+    </div></div>`;
+  if(tab==='about') body=`<div class="grid">
+    <div class="card card-pad"><h3>${t('iaT')}</h3><div class="ia" style="margin-top:14px">${[
+      ['overview',{ar:'ماذا يحدث الآن؟ المؤشرات، الخريطة، القرارات المعلقة، السجل.',en:'What’s happening now? KPIs, map, pending decisions, log.'}],
+      ['liveMap',{ar:'أين؟ المناطق، الأعمدة، الفعاليات، التظليل والرذاذ.',en:'Where? Zones, poles, events, shade and misting.'}],
+      ['zones',{ar:'لماذا؟ UTCI، الظروف، العوامل المسببة، التوصية.',en:'Why? UTCI, conditions, causes, recommendation.'}],
+      ['alerts',{ar:'ماذا أفعل؟ تنبيه + سبب + إجراء.',en:'What do I do? Alert + cause + action.'}],
+      ['events',{ar:'متى وأين أفضل؟ تحسين الفعاليات.',en:'Best when and where? Event optimization.'}],
+      ['automation',{ar:'التنفيذ باعتماد المشغل والقواعد.',en:'Execution via operator approval and rules.'}],
+      ['analytics',{ar:'ماذا تعلمنا؟ الاتجاهات والموارد والرؤى.',en:'What did we learn? Trends, resources, insights.'}],
+      ['sensors',{ar:'صحة البيانات: الأعمدة والبطاريات والاتصال.',en:'Data health: poles, batteries, connectivity.'}]].map(([k,d])=>`<div><b>${t(k)}</b><span>${L(d)}</span></div>`).join('')}</div></div>
+    <div class="card card-pad"><h3>${t('flowT')}</h3><div class="flow" style="margin-top:14px">${['g1','g2','g3','g4',null,'g5','g6','g7'].map(k=>k?`<span>${t(k)}</span>`:`<span>${L({ar:'فهم UTCI والسبب',en:'Understand UTCI & cause'})}</span>`).join('<em>→</em>')}</div>
+      <div class="flow" style="margin-top:18px">${['sense','analyze','decide','act','learn'].map(k=>`<span style="background:var(--brand-soft);color:var(--brand);border-color:transparent">${t(k)}</span>`).join('<em>→</em>')}</div></div>
+    <div class="card card-pad"><h3>${LANG==='ar'?'طبقة الذكاء الاصطناعي':'AI layer'}</h3><div class="ia" style="margin-top:14px">${[
+      [{ar:'التنبؤ',en:'Prediction'},{ar:'توقع UTCI لكل منطقة حتى 48 ساعة.',en:'UTCI forecast per zone up to 48 h.'}],
+      [{ar:'التوصية',en:'Recommendation'},{ar:'الإجراء الأنسب مع السبب والأثر المتوقع.',en:'Best action with cause and expected impact.'}],
+      [{ar:'تحسين الفعاليات',en:'Event optimization'},{ar:'أفضل منطقة ووقت لكل فعالية.',en:'Best zone and time per event.'}],
+      [{ar:'اكتشاف الأنماط',en:'Pattern detection'},{ar:'ساعات الذروة والمناطق المتكررة.',en:'Peak hours and recurring hot zones.'}],
+      [{ar:'تحسين الموارد',en:'Resource optimization'},{ar:'تشغيل الرذاذ والمراوح فقط عند الحاجة.',en:'Run misting and fans only when needed.'}]].map(([a,b])=>`<div><b>${L(a)}</b><span>${L(b)}</span></div>`).join('')}</div></div></div>`;
+  return `<div class="page-head"><div><h1>${t('settings')}</h1><p class="muted">${t('setSub')}</p></div></div>
+  <div class="tabs">${[['general','general'],['ds','designSystem'],['about','about']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-act="setTab" data-k="${k}">${t(l)}</button>`).join('')}</div>${body}`;
+}
+
+/* ---------------- Modal & toast ---------------- */
+function modal(html){document.getElementById('modal-root').innerHTML=`<div class="modal-bg" data-act="mclose-bg"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=document.querySelector('.modal .btn-primary,.modal .btn-dark');b&&b.focus()}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+function toast(msg){const el=document.createElement('div');el.className='toast';el.innerHTML=I.check+`<span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),3600)}
+const mHead=(title,sub)=>`<div class="modal-h"><div><h2>${title}</h2>${sub?`<p class="muted sm" style="margin-top:4px">${sub}</p>`:''}</div><button class="icon-btn" data-act="mclose" aria-label="${t('close')}">${I.x}</button></div>`;
+function logAdd(x,s,c='brand'){S.log.unshift({t:clockStr(S.clock),x,s,c,isNew:true});setTimeout(()=>S.log.forEach(l=>l.isNew=false),2500)}
+
+/* Main demo action: AI recommendation -> operator approval -> action */
+function openActivate(zid){
+  const z=Z(zid), rec=recFor(z); if(!rec) return;
+  if(zid==='C') bumpStep(4);
+  const cmds=rec.sys.map(s=>s==='shading'?'cmdShade':s==='misting'?'cmdMist':'cmdFans');
+  modal(`${mHead(t('approveTitle')+' — '+zn(zid),L(z.name))}
+  <div class="modal-b"><p class="muted">${t('approveP')}</p>
+    <ul class="steps-list" style="margin-top:14px" id="cmdList">${[...cmds,'cmdVerify'].map(k=>`<li data-k="${k}"><span class="st"></span>${t(k)}</li>`).join('')}</ul>
+    <div class="compare" style="margin-top:16px"><div><div class="faint sm">UTCI ${LANG==='ar'?'الآن':'now'}</div><div class="num" style="font-size:24px;font-weight:600;color:var(--${stOf(z.utci)})">${z.utci.toFixed(1)}°</div></div><div class="best"><div class="faint sm">${LANG==='ar'?'المتوقع بعد 6 دقائق':'Expected in 6 min'}</div><div class="num" style="font-size:24px;font-weight:600;color:var(--brand)">${(z.utci-rec.drop).toFixed(1)}°</div></div></div>
+  </div>
+  <div class="modal-f"><button class="btn btn-text" data-act="mclose">${t('cancel')}</button><button class="btn btn-primary" data-act="doActivate" data-id="${zid}">${t('approve')}</button></div>`);
+}
+function doActivate(zid){
+  const z=Z(zid), rec=recFor(z);
+  const btns=document.querySelectorAll('.modal-f .btn'); btns.forEach(b=>b.disabled=true);
+  document.querySelector('.modal-f .btn-primary').textContent=t('sending');
+  const items=[...document.querySelectorAll('#cmdList li')];
+  let i=0;
+  const step=()=>{
+    if(i>0){items[i-1].classList.remove('doing');items[i-1].classList.add('done');items[i-1].querySelector('.st').innerHTML=I.check}
+    if(i<items.length){items[i].classList.add('doing');i++;setTimeout(step,650)}
+    else setTimeout(()=>finishActivate(zid,rec),350);
+  };
+  step();
+}
+function finishActivate(zid,rec){
+  const z=Z(zid); const prevSt=stOf(z.utci);
+  z.prev=z.utci;
+  const target=+(z.utci-rec.drop).toFixed(1);
+  z.mitigated=true;
+  if(rec.sys.includes('shading')){z.solar=Math.round(z.solar*.24)}
+  if(rec.sys.includes('misting')){z.temp=+(z.temp-3.2).toFixed(1);z.hum=z.hum+14}
+  if(rec.sys.includes('fans')){z.wind=+(z.wind+2.1).toFixed(1)}
+  z.utci=target;
+  rec.sys.forEach(s=>{const d=D(zid+'-'+s); if(d){d.status='on';d.last={ar:`اعتمدته نورة ${clockStr(S.clock)}`,en:`Approved by Noura ${clockStr(S.clock)}`}}});
+  S.alerts.filter(a=>a.zone===zid&&a.type==='heat'&&a.status!=='resolved').forEach(a=>a.status='resolved');
+  logAdd({ar:`${L(rec.title)} — ${zn(zid)}`,en:`${rec.title.en} — Zone ${zid}`},{ar:`توصية هبوب · اعتمدتها نورة القحطاني · UTCI ${z.prev}° ← ${target}°`,en:`Haboob recommendation · approved by Noura Al-Qahtani · UTCI ${z.prev}° → ${target}°`});
+  S.kpiFlash=['ok','attn','crit','alerts']; setTimeout(()=>S.kpiFlash=null,1500);
+  if(zid==='C') bumpStep(6);
+  const newSt=stOf(target);
+  modal(`<div class="modal-b" style="text-align:center;padding-top:30px"><div class="success-mark">${I.check}</div><h2>${t('doneTitle')}</h2><p class="muted" style="margin-top:6px">${t('doneP')}</p>
+    <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin:20px 0 6px">${stBadge(prevSt)}<span class="faint">${LANG==='ar'?'←':'→'}</span>${stBadge(newSt)}</div>
+    <div class="num faint">UTCI ${z.prev.toFixed(1)}° ${LANG==='ar'?'←':'→'} <b style="color:var(--${newSt})">${target.toFixed(1)}°</b></div></div>
+    <div class="modal-f" style="justify-content:center"><button class="btn btn-ghost" data-act="mclose">${t('stayHere')}</button><button class="btn btn-primary" data-act="toOverviewFlash" data-id="${zid}">${t('backOverview')}</button></div>`);
+  if(S.route==='zone') render();
+}
+
+function openOptimize(eid){
+  const e=S.events.find(x=>x.id===eid); if(!e||!e.opt) return;
+  const o=e.opt;
+  modal(`${mHead(t('optTitle'),L(e.name)+' · '+e.visitors.toLocaleString('en')+' '+t('visitors'))}
+  <div class="modal-b" id="optBody"><div style="display:flex;align-items:center;gap:10px;padding:30px 0;justify-content:center" class="muted"><span class="st" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--brand);border-top-color:transparent;animation:spin .8s linear infinite;display:inline-block"></span>${LANG==='ar'?'هبوب يحلل توقعات 24 منطقة…':'Haboob is analyzing forecasts for 24 zones…'}</div></div>
+  <div class="modal-f"><button class="btn btn-text" data-act="mclose">${t('cancel')}</button><button class="btn btn-primary" data-act="applyOpt" data-id="${eid}" disabled id="applyBtn">${t('apply')}</button></div>`);
+  setTimeout(()=>{const b=document.getElementById('optBody'); if(!b) return;
+    b.innerHTML=`<div class="compare">
+      <div><b>${t('current')}</b><dl><dt>${t('ev_zone')}</dt><dd>${zn(e.zone)}</dd><dt>${t('ev_time')}</dt><dd class="num">${e.time}</dd><dt>${t('expUtci')}</dt><dd class="num" style="color:var(--crit)">${e.utci}°</dd><dt>${t('wind')}</dt><dd class="num">${Z(e.zone).wind} m/s</dd></dl><div style="margin-top:10px">${riskBadge(e.risk)}</div></div>
+      <div class="best"><b style="color:var(--brand)">${I.spark.replace('<svg','<svg width="13" height="13" style="vertical-align:-2px"')} ${t('suggested')}</b><dl><dt>${t('bestZone')}</dt><dd>${zn(o.zone)}</dd><dt>${t('bestTime')}</dt><dd class="num">${o.time}</dd><dt>${t('expUtci')}</dt><dd class="num" style="color:var(--ok)">${o.utci}°</dd><dt>${t('wind')}</dt><dd class="num">${Z(o.zone).wind} m/s</dd></dl><div style="margin-top:10px">${riskBadge(o.utci<32?'low':'mod')}</div></div></div>
+      <div class="rec-line" style="margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);font-size:13.5px"><b>${t('reason')}:</b> ${L(o.reason)}</div>`;
+    document.getElementById('applyBtn').disabled=false;
+  },900);
+}
+
+/* ---------------- Render & routing ---------------- */
+function render(){
+  const app=document.getElementById('app');
+  document.documentElement.lang=LANG; document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
+  document.title=(LANG==='ar'?'هبوب':'HABOOB')+' | '+t(navKey[S.route]||'overview');
+  if(!S.authed){app.innerHTML=pageLogin();bindLogin();return}
+  const pages={overview:pageOverview,map:pageMap,zones:pageZones,zone:pageZone,alerts:pageAlerts,events:pageEvents,automation:pageAutomation,analytics:pageAnalytics,sensors:pageSensors,settings:pageSettings};
+  const y=window.scrollY;
+  app.innerHTML=shell((pages[S.route]||pageOverview)());
+  if(S._keepScroll) window.scrollTo(0,y); S._keepScroll=false;
+  const sq=document.getElementById('sq');
+  if(sq){sq.addEventListener('input',e=>{S.sensorQ=e.target.value;const pos=e.target.selectionStart;S._keepScroll=true;render();const n=document.getElementById('sq');n.focus();n.setSelectionRange(pos,pos)})}
+}
+function soft(){S._keepScroll=true;render()}
+function route(){
+  const h=location.hash.replace(/^#\/?/,'').split('/');
+  S.route=NAV.some(n=>n[0]===h[0])||h[0]==='zone'?h[0]:'overview';
+  S.param=h[1]||null; S.popPole=null;
+  render(); window.scrollTo(0,0);
+}
+function go(r){location.hash='#/'+r}
+function bindLogin(){
+  const f=document.getElementById('loginForm');
+  f&&f.addEventListener('submit',e=>{e.preventDefault();const b=document.getElementById('loginBtn');b.disabled=true;b.textContent=t('signingIn');
+    setTimeout(()=>{S.authed=true;bumpStep(1);if(!location.hash||location.hash==='#/')location.hash='#/overview';route();
+      setTimeout(()=>{S.newAlert='a1';toast(t('newAlert'));},1200);},700)});
+}
+
+const actions={
+  lang:d=>{LANG=d.l;soft()},
+  theme:()=>{const cur=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');S.theme=cur==='dark'?'light':'dark';document.documentElement.dataset.theme=S.theme;soft()},
+  setTheme:d=>{S.theme=d.k;if(d.k==='system')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=d.k;soft()},
+  goto:d=>go(d.to),
+  zone:d=>{if(S.route==='overview'||S.route==='map'){S.selZone=d.id;S.popPole=null;soft()}else go('zone/'+d.id)},
+  openzone:d=>go('zone/'+d.id),
+  pole:d=>{S.popPole=S.popPole===d.id?null:d.id;soft()},
+  layer:d=>{S.layers[d.k]=!S.layers[d.k];soft()},
+  back:()=>history.length>1?history.back():go('overview'),
+  alertgo:d=>{const a=S.alerts.find(x=>x.id===d.id);if(!a)return;if(a.id==='a1')bumpStep(2);
+    if(a.type==='heat')go('zone/'+a.zone);else if(a.type==='event')openOptimize(a.ev);else go('sensors')},
+  activate:d=>openActivate(d.id),
+  doActivate:d=>doActivate(d.id),
+  toOverviewFlash:d=>{closeModal();S.flash=d.id;S.selZone=d.id;if(d.id==='C')bumpStep(6);setTimeout(()=>{S.flash=null},5000);go('overview');setTimeout(()=>toast(L({ar:`تم تحديث حالة ${zn(d.id)}`,en:`Zone ${d.id} status updated`})),400)},
+  schedule:()=>{toast(t('scheduled'));logAdd({ar:`جدولة إجراء — ${zn(S.selZone)}`,en:`Action scheduled — Zone ${S.selZone}`},{ar:'14:45 · بواسطة نورة القحطاني',en:'14:45 · by Noura Al-Qahtani'},'info')},
+  dismiss:()=>{toast(t('dismissed'));logAdd({ar:`تجاهل توصية — ${zn(S.selZone)}`,en:`Recommendation dismissed — Zone ${S.selZone}`},{ar:'بواسطة نورة القحطاني',en:'by Noura Al-Qahtani'},'neutral')},
+  mclose:()=>closeModal(),
+  'mclose-bg':(d,el,ev)=>{if(ev.target===el)closeModal()},
+  afilter:d=>{S.alertFilter=d.k;soft()},
+  sfilter:d=>{S.sensorFilter=d.k;soft()},
+  sysf:d=>{S.sysFilter=S.sysFilter===d.k&&d.k!=='all'?'all':d.k;soft()},
+  optimize:d=>openOptimize(d.id),
+  applyOpt:d=>{const e=S.events.find(x=>x.id===d.id);const o=e.opt;
+    logAdd({ar:`نقل "${e.name.ar}" إلى ${zn(o.zone)} ${o.time}`,en:`Moved "${e.name.en}" to Zone ${o.zone} at ${o.time}`},{ar:'تحسين الفعاليات · اعتمدته نورة القحطاني',en:'Event optimization · approved by Noura Al-Qahtani'});
+    e.zone=o.zone;e.time=o.time;e.utci=o.utci;e.risk=o.utci<32?'low':'mod';e.optimized=true;
+    S.alerts.filter(a=>a.ev===e.id).forEach(a=>a.status='resolved');
+    closeModal();toast(t('applied'));soft()},
+  dispatch:d=>{const a=S.alerts.find(x=>x.id===d.id);a.status='progress';a.problem={ar:'تم إرسال فريق الصيانة — الوصول المتوقع خلال 12 دقيقة.',en:'Maintenance dispatched — expected on site in 12 minutes.'};
+    logAdd({ar:'إرسال فريق الصيانة إلى HB-P13',en:'Maintenance dispatched to HB-P13'},{ar:'فريق المرافق · المنطقة M',en:'Facilities team · Zone M'},'info');toast(L({ar:'تم إرسال فريق الصيانة',en:'Maintenance dispatched'}));soft()},
+  mode:d=>{const x=D(d.id);x.mode=d.m;soft()},
+  devon:d=>{const x=D(d.id);modal(`${mHead(t('confirmOn'),`${t(x.sys)} — ${zfull(Z(x.zone))}`)}<div class="modal-b"><p class="muted">${t('confirmOnP')}</p></div><div class="modal-f"><button class="btn btn-text" data-act="mclose">${t('cancel')}</button><button class="btn btn-primary" data-act="approveDev" data-id="${x.id}">${t('turnOn')}</button></div>`)},
+  approveDev:d=>{const x=D(d.id);x.status='on';x.last={ar:`اعتمدته نورة ${clockStr(S.clock)}`,en:`Approved by Noura ${clockStr(S.clock)}`};
+    logAdd({ar:`تشغيل ${T[x.sys][0]} — المنطقة ${x.zone}`,en:`${T[x.sys][1]} on — Zone ${x.zone}`},{ar:'اعتماد يدوي · نورة القحطاني',en:'Manual approval · Noura Al-Qahtani'});
+    closeModal();toast(L({ar:`تم تشغيل ${T[x.sys][0]} في المنطقة ${x.zone}`,en:`${T[x.sys][1]} turned on in Zone ${x.zone}`}));soft()},
+  reject:d=>{const x=D(d.id);x.status='off';x.last={ar:`رفضه المشغل ${clockStr(S.clock)}`,en:`Rejected by operator ${clockStr(S.clock)}`};logAdd({ar:`رفض تشغيل ${T[x.sys][0]} — المنطقة ${x.zone}`,en:`${T[x.sys][1]} rejected — Zone ${x.zone}`},{ar:'نورة القحطاني',en:'Noura Al-Qahtani'},'neutral');soft()},
+  devoff:d=>{const x=D(d.id);x.status='off';x.last={ar:`أوقفته نورة ${clockStr(S.clock)}`,en:`Stopped by Noura ${clockStr(S.clock)}`};logAdd({ar:`إيقاف ${T[x.sys][0]} — المنطقة ${x.zone}`,en:`${T[x.sys][1]} off — Zone ${x.zone}`},{ar:'نورة القحطاني',en:'Noura Al-Qahtani'},'neutral');toast(L({ar:'تم الإيقاف',en:'Turned off'}));soft()},
+  config:d=>{const x=D(d.id);modal(`${mHead(t('configTitle'),`${t(x.sys)} — ${zfull(Z(x.zone))}`)}<div class="modal-b">
+    <label class="f">${t('ruleWhen')}: <b class="num" id="thv">${x.th}°</b></label><input type="range" min="30" max="46" step="0.5" value="${x.th}" id="thr" style="width:100%;accent-color:var(--brand)" oninput="document.getElementById('thv').textContent=this.value+'°'">
+    <div class="layer" style="margin-top:12px"><div class="txt">${t('requireApproval')}<small>${LANG==='ar'?'موصى به للأنظمة المستهلكة للمياه':'Recommended for water-consuming systems'}</small></div><button class="switch ${x.approval?'on':''}" id="apr" onclick="this.classList.toggle('on')" aria-label="${t('requireApproval')}"></button></div></div>
+    <div class="modal-f"><button class="btn btn-text" data-act="mclose">${t('cancel')}</button><button class="btn btn-primary" data-act="saveCfg" data-id="${x.id}">${t('save')}</button></div>`)},
+  saveCfg:d=>{const x=D(d.id);x.th=+document.getElementById('thr').value;x.approval=document.getElementById('apr').classList.contains('on');closeModal();toast(t('saved'));soft()},
+  setTab:d=>{S.setTab=d.k;soft()},
+  notif:d=>{S.notif[d.k]=!S.notif[d.k];soft()},
+  guide:()=>{S.guideMin=!S.guideMin;soft()},
+  logout:()=>{S.authed=false;S.demoStep=0;location.hash='';render()},
+};
+document.addEventListener('click',ev=>{
+  const el=ev.target.closest('[data-act]'); if(!el) return;
+  const a=actions[el.dataset.act]; if(!a) return;
+  if(el.tagName==='A') ev.preventDefault();
+  a(el.dataset,el,ev);
+});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Escape') closeModal();
+  if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches('g[data-act],.sys-card')){ev.preventDefault();ev.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}
+});
+window.addEventListener('hashchange',()=>{if(S.authed)route()});
+setInterval(()=>{S.clock=new Date(S.clock.getTime()+1000);const c=document.getElementById('clk');if(c)c.textContent=clockStr(S.clock)},1000);
+render();
+</script>
+</body>
+</html>

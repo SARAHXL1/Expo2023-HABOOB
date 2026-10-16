@@ -1,0 +1,8 @@
+{
+  "name": "VEML7700 (Habub sim)",
+  "author": "Habub team",
+  "pins": ["VIN", "GND", "SCL", "SDA", "3Vo", "INT"],
+  "controls": [
+    { "id": "lux", "label": "Illuminance (lux)", "type": "range", "min": 0, "max": 30000, "step": 10 }
+  ]
+}

@@ -1,0 +1,15 @@
+# macOS / Office
+.DS_Store
+~$*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# أسرار الشبكة: انسخ secrets.example.h باسم secrets.h محليًا ولا ترفعه
+**/secrets.h
+
+# قاعدة بيانات القراءات تُنشأ تلقائيًا عند تشغيل الخادم
+src/data/*.db
+src/data/*.db-journal

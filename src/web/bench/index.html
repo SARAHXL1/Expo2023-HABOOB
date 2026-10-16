@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>هبوب — موقع اختبار الحساسات</title>
+<!-- UI-02: كل الملفات محلية، ولا يوجد أي طلب للإنترنت في هذه الصفحة -->
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<!-- UI-06: رسالة واضحة عند انقطاع الخادم، بدل تجمّد القيم -->
+<div id="offlineBanner" class="offline-banner">
+  ⚠ تعذر الاتصال بالخادم. القيم المعروضة قديمة. تأكد أن الخادم يعمل على اللابتوب.
+</div>
+<div id="libWarning" class="lib-warning">
+  ⚠ مكتبة pythermalcomfort غير مثبّتة، فلا يُحسب UTCI. نفّذ في الطرفية:
+  <code>pip install pythermalcomfort</code>
+</div>
+
+<div class="topbar">
+  <div class="brand">
+    <h1>هبوب — موقع اختبار الحساسات</h1>
+    <span class="sub">عقدة استشعار الراحة الحرارية · تحدي 2.3 · هاكثون إكسبو 2030 الرياض</span>
+  </div>
+  <div class="tools-row">
+    <!-- مفتاح الوضع: العتاد الحقيقي أو المحاكاة -->
+    <div class="modeswitch" id="modeSwitch">
+      <button data-mode="live" id="modeLive" title="عرض الحساسات الموصولة فعلًا فقط">🔌 العتاد الحقيقي</button>
+      <button data-mode="sim"  id="modeSim"  title="بيانات وهمية بلا عتاد">🧪 المحاكاة</button>
+    </div>
+    <!-- UI-08: اختيار العقدة -->
+    <select id="nodeSelect" title="اختر العقدة"><option>…</option></select>
+    <button id="pauseBtn" title="إيقاف التحديث التلقائي مؤقتًا">⏸ إيقاف التحديث</button>
+    <!-- UI-07: وضع العرض أمام اللجنة -->
+    <button id="presentBtn" title="تكبير القيم الأساسية وإخفاء التشخيص">🔎 وضع العرض</button>
+  </div>
+</div>
+
+<div class="wrap sections">
+
+  <!-- شريط الوضع الحالي -->
+  <div class="modebar" id="modeBar">
+    <span class="modebar-icon" id="modeIcon">🧪</span>
+    <div>
+      <div class="modebar-title" id="modeTitle">—</div>
+      <div class="modebar-sub" id="modeSub">—</div>
+    </div>
+  </div>
+
+  <!-- 1 ------------------------------------------------------- شريط العقدة -->
+  <div class="nodebar" id="nodebar">
+    <div class="node-name"><span class="dot off" id="nodeDot"></span><span id="nodeName">—</span></div>
+    <div class="item"><span class="k">آخر ظهور</span><span class="v" id="lastSeen">—</span></div>
+    <div class="item"><span class="k">الاتصال</span><span class="v" id="transport">—</span></div>
+    <div class="item"><span class="k">قوة الإشارة</span>
+      <span class="v" style="display:flex;align-items:center;gap:9px">
+        <span class="bars" id="rssiBars"><i></i><i></i><i></i><i></i></span>
+        <span id="rssiVal" style="font-size:16px">—</span>
+      </span>
+    </div>
+    <div class="item" id="powerItem"><span class="k">مصدر الطاقة</span>
+      <span class="v" id="powerVal">—</span>
+    </div>
+    <div class="item" id="batteryItem" style="display:none"><span class="k">البطارية</span>
+      <span class="v battery-wrap">
+        <span class="battery"><span class="fill" id="batFill" style="width:0%"></span></span>
+        <span id="batVal" style="font-size:17px">—</span>
+      </span>
+    </div>
+    <div class="item"><span class="k">وقت التشغيل</span><span class="v" id="uptime">—</span></div>
+    <div class="item"><span class="k">إصدار البرنامج</span><span class="v" id="fw">—</span></div>
+    <div class="item hide-on-present"><span class="k">عدد الرسائل</span><span class="v" id="msgCount">—</span></div>
+  </div>
+
+  <!-- 2 و 3 ------------------------------ بطاقة UTCI الكبيرة + بطاقات القطع -->
+  <div class="main-grid">
+    <div class="utci-card" id="utciCard">
+      <div class="label">مؤشر المناخ الحراري الشامل · UTCI</div>
+      <div id="utciBody">
+        <div class="value" id="utciValue">—</div>
+        <div class="category" id="utciCategory">بانتظار البيانات…</div>
+      </div>
+      <div class="sub" id="utciSub">
+        <div><div class="k">متوسط الحرارة الإشعاعية MRT <span class="mrt-badge" id="mrtBadge" style="display:none">مفترضة</span></div><div class="v" id="mrtVal">—</div></div>
+        <div><div class="k">الرياح عند 10 م</div><div class="v" id="v10Val">—</div></div>
+      </div>
+      <div id="windClamped" style="display:none"><span class="chip">⚠ رياح مقيّدة</span></div>
+    </div>
+
+    <div>
+      <div class="section-title">القطع وحالاتها</div>
+      <div class="cards" id="cards"></div>
+    </div>
+  </div>
+
+  <!-- 4 --------------------------------------------------------- التنبيهات -->
+  <div>
+    <div class="section-title">التنبيهات</div>
+    <div class="alerts" id="alerts"><div class="alerts-empty">لا توجد تنبيهات.</div></div>
+  </div>
+
+  <!-- 5 ----------------------------------------------------- الرسوم الصغيرة -->
+  <div class="hide-on-present">
+    <div class="section-title">
+      آخر <span id="histMinutesLabel">15</span> دقيقة
+      <select id="histMinutes" style="margin-right:auto;font-size:13px;padding:4px 8px">
+        <option value="10">10 دقائق</option>
+        <option value="15" selected>15 دقيقة</option>
+        <option value="30">30 دقيقة</option>
+        <option value="60">60 دقيقة</option>
+      </select>
+    </div>
+    <div class="charts" id="charts"></div>
+  </div>
+
+  <!-- 6 ----------------------------------------------- لوحة التشخيص (قابلة للطي) -->
+  <details class="diag hide-on-present" id="diagPanel">
+    <summary>لوحة التشخيص</summary>
+    <div class="diag-body">
+      <div class="diag-grid" id="diagGrid"></div>
+
+      <div>
+        <div class="section-title">آخر رسالة JSON خام كما وصلت</div>
+        <pre class="raw" id="rawJson">—</pre>
+      </div>
+
+      <div>
+        <div class="section-title">آخر الرسائل المرفوضة</div>
+        <div class="err-list" id="errList"><div class="muted">لا توجد رسائل مرفوضة.</div></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- 7 ------------------------------------------------------------- أدوات -->
+  <div class="tools hide-on-present">
+    <div class="section-title" style="margin:0">أدوات</div>
+
+    <div class="tools-row">
+      <button class="primary" id="exportBtn">⬇ تصدير CSV</button>
+      <select id="exportRange">
+        <option value="0">كل البيانات المخزنة</option>
+        <option value="15">آخر 15 دقيقة</option>
+        <option value="60">آخر ساعة</option>
+        <option value="180">آخر 3 ساعات</option>
+      </select>
+      <span class="hint-line">يُفتح الملف في الإكسل بأعمدة واضحة، وفيه عمود لكل قيمة وعمود لكل حالة.</span>
+    </div>
+
+    <div class="tool-group">
+      <h3>معاملات المعايرة للعقدة المختارة</h3>
+      <div class="tools-row" style="align-items:flex-end">
+        <div class="field"><label>K (معامل الرياح)</label><input id="calK" type="number" step="0.01"></div>
+        <div class="field"><label>B (سرعة البدء)</label><input id="calB" type="number" step="0.01"></div>
+        <div class="field"><label>V_MIN (فولت)</label><input id="calVmin" type="number" step="0.001"></div>
+        <div class="field"><label>ارتفاع الرياح (م)</label><input id="calH" type="number" step="0.1"></div>
+        <div class="field"><label>تصحيح الكرة (°م)</label><input id="calGlobe" type="number" step="0.1"></div>
+        <button class="primary" id="calSave">حفظ المعايرة</button>
+        <span id="calMsg"></span>
+      </div>
+      <div class="hint-line">
+        المعادلة: سرعة الرياح = K × جهد الموتور + B، وتساوي صفرًا إن كان الجهد أقل من V_MIN.
+        تُحفظ في الخادم وتُطبّق على الرسائل القادمة، فلا تحتاج إعادة برمجة ESP32 (SV-15).
+      </div>
+    </div>
+
+    <div class="tool-group" id="simToolGroup">
+      <h3>وضع المحاكاة</h3>
+      <div class="tools-row">
+        <button id="simToggle">▶ تشغيل المحاكاة</button>
+        <span id="simStatus" class="hint-line">—</span>
+      </div>
+      <div class="hint-line" style="margin:10px 0 7px">محاكاة الأعطال على العقدة المختارة:</div>
+      <div class="fault-grid" id="faultGrid"></div>
+      <div class="tools-row" style="margin-top:10px">
+        <button id="faultApply">تطبيق الأعطال</button>
+        <button id="faultClear">مسح كل الأعطال</button>
+      </div>
+      <div class="hint-line">
+        المحاكاة تولّد بيانات وهمية واقعية بلا أي عتاد، لاختبار اللوحة قبل وصول القطع (المرحلة 0).
+      </div>
+    </div>
+
+    <div class="tool-group">
+      <h3>عنوان الخادم لإعدادات ESP32</h3>
+      <pre class="raw" id="serverHint" style="max-height:none">—</pre>
+    </div>
+  </div>
+
+  <div class="muted" style="font-size:13px;text-align:center;padding-top:6px">
+    الخادم: <span id="healthLine">—</span>
+  </div>
+
+</div>
+
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

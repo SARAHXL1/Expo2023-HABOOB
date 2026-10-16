@@ -1,0 +1,14 @@
+{
+  "wind_k": 20.0,
+  "wind_b": 0.5,
+  "wind_voltage_min": 0.02,
+  "wind_sensor_height_m": 1.8,
+  "surface_roughness_m": 0.01,
+  "lux_per_wm2": 110.0,
+  "sun_radiation_threshold_wm2": 250.0,
+  "direct_radiation_fraction": 0.8,
+  "pressure_hpa": 945.0,
+  "latitude": 24.71,
+  "longitude": 46.68,
+  "timezone_utc_offset_hours": 3
+}

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "author": "Habub team",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -153.3, "left": -159, "attrs": { "temperature": "32", "humidity": "30" } },
+    { "type": "chip-ads1115", "id": "ads", "top": -142.98, "left": 216, "attrs": {} },
+    { "type": "chip-mlx90614", "id": "mlx", "top": -46.98, "left": 216, "attrs": {} },
+    { "type": "chip-veml7700", "id": "veml", "top": 49.02, "left": 216, "attrs": {} },
+    { "type": "wokwi-ili9341", "id": "tft", "top": -50, "left": -260, "rotate": 0, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "dht1:VCC", "esp:3V3", "orange", [] ],
+    [ "dht1:GND", "esp:GND.1", "black", [] ],
+    [ "dht1:SDA", "esp:4", "gold", [] ],
+
+    [ "ads:VDD", "esp:3V3", "orange", [] ],
+    [ "ads:GND", "esp:GND.2", "black", [] ],
+    [ "ads:SDA", "esp:21", "blue", [] ],
+    [ "ads:SCL", "esp:22", "green", [] ],
+    [ "ads:ADDR", "esp:GND.2", "black", [] ],
+
+    [ "mlx:VIN", "esp:3V3", "orange", [] ],
+    [ "mlx:GND", "esp:GND.2", "black", [] ],
+    [ "mlx:SDA", "esp:21", "blue", [] ],
+    [ "mlx:SCL", "esp:22", "green", [] ],
+
+    [ "veml:VIN", "esp:3V3", "orange", [] ],
+    [ "veml:GND", "esp:GND.3", "black", [] ],
+    [ "veml:SDA", "esp:21", "blue", [] ],
+    [ "veml:SCL", "esp:22", "green", [] ],
+
+    [ "tft:VCC", "esp:3V3", "orange", [] ],
+    [ "tft:GND", "esp:GND.1", "black", [] ],
+    [ "tft:SCK", "esp:18", "violet", [] ],
+    [ "tft:MOSI", "esp:23", "violet", [] ],
+    [ "tft:CS", "esp:5", "white", [] ],
+    [ "tft:D/C", "esp:16", "white", [] ],
+    [ "tft:RST", "esp:17", "white", [] ],
+    [ "tft:LED", "esp:32", "gray", [] ]
+  ],
+  "dependencies": {}
+}

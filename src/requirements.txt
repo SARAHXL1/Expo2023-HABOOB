@@ -1,0 +1,5 @@
+numpy>=1.24,<3
+thermofeel==2.3.0
+pythermalcomfort
+pyserial
+pandas>=2.0,<3

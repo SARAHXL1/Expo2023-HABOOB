@@ -1,0 +1,194 @@
+{
+  "_note": "ملف الإعدادات الوحيد لمشروع هبوب (SV-14). كل الأرقام هنا قابلة للتعديل بلا تغيير في الكود.",
+  "mode": "live",
+  "_mode_note": "وضع التشغيل: \"live\" لاختبار العتاد الموصول فعلًا، أو \"sim\" للمحاكاة بلا عتاد. يُبدَّل من اللوحة مباشرة.",
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5050,
+    "db_path": "data/readings.db",
+    "errors_keep": 50,
+    "history_keep_minutes": 180
+  },
+  "timing": {
+    "sensor_stale_s": 30,
+    "node_offline_s": 15,
+    "dashboard_refresh_ms": 2000,
+    "history_minutes_default": 15
+  },
+  "ranges": {
+    "ta_c": {
+      "min": -10,
+      "max": 60,
+      "label": "حرارة الهواء",
+      "unit": "°م"
+    },
+    "rh_pct": {
+      "min": 0,
+      "max": 100,
+      "label": "الرطوبة",
+      "unit": "%"
+    },
+    "tg_c": {
+      "min": -10,
+      "max": 90,
+      "label": "حرارة الكرة",
+      "unit": "°م"
+    },
+    "wind_v": {
+      "min": 0,
+      "max": 0.6,
+      "label": "جهد الموتور",
+      "unit": "V"
+    },
+    "wind_ms": {
+      "min": 0,
+      "max": 30,
+      "label": "سرعة الرياح",
+      "unit": "م/ث"
+    },
+    "tsurf_c": {
+      "min": -20,
+      "max": 90,
+      "label": "حرارة الأرض",
+      "unit": "°م"
+    },
+    "tamb_c": {
+      "min": -20,
+      "max": 85,
+      "label": "حرارة الحساس",
+      "unit": "°م"
+    },
+    "lux": {
+      "min": 0,
+      "max": 140000,
+      "label": "الإضاءة",
+      "unit": "لوكس"
+    },
+    "bat_v": {
+      "min": 2.9,
+      "max": 4.3,
+      "label": "جهد البطارية",
+      "unit": "V"
+    },
+    "rssi": {
+      "min": -90,
+      "max": -30,
+      "label": "قوة الإشارة",
+      "unit": "dBm"
+    }
+  },
+  "warnings": {
+    "battery_low_v": 3.4,
+    "battery_critical_v": 3.1,
+    "rssi_weak_dbm": -80
+  },
+  "globe": {
+    "diameter_m": 0.04,
+    "emissivity": 0.95,
+    "standard": "ISO",
+    "_note": "تُستخدم فقط عندما يكون mrt_source = globe"
+  },
+  "utci_limits": {
+    "wind_min_ms": 0.5,
+    "wind_max_ms": 17.0,
+    "mrt_below_tdb_c": 30.0,
+    "mrt_above_tdb_c": 70.0
+  },
+  "disabled_sensors": [
+    "battery",
+    "mlx90614"
+  ],
+  "node_defaults": {
+    "wind_height_m": 1.8,
+    "wind_k": 20.0,
+    "wind_b": 0.5,
+    "wind_v_min": 0.02,
+    "globe_offset_c": 0.0,
+    "recompute_wind_on_server": true
+  },
+  "nodes": {
+    "node-01": {
+      "name": "العقدة الأولى",
+      "wind_height_m": 1.8,
+      "wind_k": 20.0,
+      "wind_b": 0.5,
+      "wind_v_min": 0.02,
+      "globe_offset_c": 0.0,
+      "recompute_wind_on_server": true
+    },
+    "sim-01": {
+      "name": "عقدة محاكاة 1",
+      "wind_height_m": 1.8,
+      "wind_k": 20.0,
+      "wind_b": 0.5,
+      "wind_v_min": 0.02,
+      "globe_offset_c": 0.0,
+      "recompute_wind_on_server": true
+    },
+    "sim-02": {
+      "name": "عقدة محاكاة 2",
+      "wind_height_m": 1.8,
+      "wind_k": 20.0,
+      "wind_b": 0.5,
+      "wind_v_min": 0.02,
+      "globe_offset_c": 0.0,
+      "recompute_wind_on_server": true
+    }
+  },
+  "checks": {
+    "calibration_mode": false,
+    "ck01_ta_tg_diff_c": 3.0,
+    "ck01_shade_lux_max": 2000,
+    "ck02_wind_zero_seconds": 20,
+    "ck05_tg_jump_c": 10.0,
+    "ck05_window_s": 10,
+    "ck06_resets_in_window": 2,
+    "ck06_window_s": 300,
+    "ck04_lux_stuck_zero_seconds": 20
+  },
+  "simulation": {
+    "enabled": false,
+    "interval_s": 5,
+    "nodes": [
+      "sim-01",
+      "sim-02"
+    ],
+    "faults": {
+      "sim-01": {},
+      "sim-02": {}
+    }
+  },
+  "mrt_source": "assumed",
+  "_mrt_source_note": "مصدر متوسط الحرارة الإشعاعية: \"assumed\" تعني MRT = حرارة الهواء، و\"globe\" تعني حسابها من الكرة. هذا هو الإعداد الوحيد اللازم لإعادة تفعيل الكرة: عند تحويله إلى globe تُفعَّل بطاقة DS18B20 والفحصان CK-01 وCK-05 وتصحيح الكرة، وتدخل tg_c في القيم الأساسية.",
+  "forecast": {
+    "_note": "توقع WBGT من Open-Meteo (GET /api/forecast). يلزمه إنترنت؛ بدونه يعيد الخادم available=false ولا يختلق قيمًا.",
+    "hours": 10,
+    "cache_s": 1800,
+    "stale_ok_s": 21600,
+    "timeout_s": 6
+  },
+  "platform": {
+    "_note": "ربط العقد بأعمدة المنصة. عمود الاختبار يظهر عند اختيار «عمود الاختبار» في زر مصدر البيانات.",
+    "test_zone": {
+      "id": "Z",
+      "name": {
+        "ar": "منطقة الاختبار — قاعة طويق",
+        "en": "Test zone — Tuwaiq hall"
+      }
+    },
+    "test_poles": {
+      "node-01": {
+        "pole_id": "HB-T01",
+        "zone": "Z"
+      },
+      "sim-01": {
+        "pole_id": "HB-S01",
+        "zone": "Z"
+      },
+      "sim-02": {
+        "pole_id": "HB-S02",
+        "zone": "Z"
+      }
+    }
+  }
+}

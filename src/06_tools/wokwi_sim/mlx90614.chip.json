@@ -1,0 +1,9 @@
+{
+  "name": "MLX90614 (Habub sim)",
+  "author": "Habub team",
+  "pins": ["VIN", "GND", "SCL", "SDA"],
+  "controls": [
+    { "id": "objectTemp", "label": "Object (ground surface) temp (°C)", "type": "range", "min": -40, "max": 125, "step": 0.5 },
+    { "id": "ambientTemp", "label": "Sensor ambient temp (°C)", "type": "range", "min": -40, "max": 85, "step": 0.5 }
+  ]
+}
